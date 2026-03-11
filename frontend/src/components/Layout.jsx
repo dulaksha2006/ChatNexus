@@ -19,6 +19,7 @@ const ADMIN_NAV = [
 
 const WORKER_NAV = [
   { to: '/',         icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/chats',    icon: MessageSquare,   label: 'Chats'     },
   { to: '/sessions', icon: MessageSquare,   label: 'Sessions'  },
 ];
 
@@ -37,7 +38,7 @@ export default function Layout({ children, title }) {
         <div className="w-7 h-7 rounded-lg bg-brand-500 flex items-center justify-center">
           <Bot className="w-4 h-4 text-white" />
         </div>
-        <span className="font-display font-bold text-white text-sm tracking-wide">ChatZY</span>
+        <span className="font-display font-bold text-white text-sm tracking-wide">ChatNexus</span>
       </div>
 
       {/* Nav */}

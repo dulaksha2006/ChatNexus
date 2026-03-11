@@ -1,31 +1,25 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { getAuth } from 'firebase/auth';
 
 let db, storage, _app;
 
-/**
- * Fetch Firebase web config from our own backend, then initialize.
- * Called once at app startup before anything renders.
- */
 export async function initFirebase() {
-  if (getApps().length > 0) return; // already initialized
+  if (getApps().length > 0) return;
 
   const res = await fetch('/api/setup/firebase-web-config');
-  if (!res.ok) {
-    // Setup not done yet — that's fine, App.jsx will redirect to /setup
-    return;
-  }
+  if (!res.ok) return;
   const config = await res.json();
-  if (!config.apiKey) return; // not configured yet
+  if (!config.apiKey) return;
 
   _app    = initializeApp(config);
   db      = getFirestore(_app);
   storage = getStorage(_app);
+  // Initialize auth (needed for custom token sign-in)
+  getAuth(_app);
 }
 
-export function getDb()      { return db; }
+export function getDb()       { return db; }
 export function getStorage_() { return storage; }
-
-// Named exports used by pages that import { db } directly
 export { db, storage };

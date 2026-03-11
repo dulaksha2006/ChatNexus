@@ -42,8 +42,21 @@ router.post('/login', async (req, res) => {
     const token = generateToken(user.id, user.role);
     const { password: _, ...safeUser } = user;
 
+    // Generate Firebase custom token so the frontend can sign in to Firestore
+    // with proper auth claims (role, uid) — enables Firestore security rules.
+    let firebaseToken = null;
+    try {
+      firebaseToken = await admin.auth().createCustomToken(user.id, {
+        role: user.role,
+        workerId: user.id,
+      });
+    } catch (e) {
+      console.warn('Firebase custom token generation failed:', e.message);
+    }
+
     res.json({
       token,
+      firebaseToken,
       user: safeUser,
       needsTelegramVerify: user.role === 'worker' && !user.telegramVerified
     });

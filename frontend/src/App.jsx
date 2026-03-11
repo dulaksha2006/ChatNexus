@@ -8,6 +8,7 @@ import Login           from './pages/Login';
 import TelegramVerify  from './pages/TelegramVerify';
 import AdminDashboard  from './pages/AdminDashboard';
 import WorkerDashboard from './pages/WorkerDashboard';
+import WorkerChats    from './pages/WorkerChats';
 import Workers         from './pages/Workers';
 import Languages       from './pages/Languages';
 import Settings        from './pages/Settings';
@@ -76,6 +77,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/"         element={<WorkerDashboard />} />
+      <Route path="/chats"    element={<WorkerChats />} />
       <Route path="/sessions" element={<Sessions />} />
       <Route path="*"         element={<Navigate to="/" replace />} />
     </Routes>

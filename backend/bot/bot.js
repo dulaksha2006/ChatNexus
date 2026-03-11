@@ -220,45 +220,64 @@ async function endSession(sessionId, custChatId, workerTgId, reason) {
   } catch (err) { console.error('endSession error:', err.message); }
 }
 
-// ─── PDF report dispatch ──────────────────────────────────────────────────────
+// ─── PDF report dispatch + delete chats from Firebase ───────────────────────
 async function dispatchReport(session, custChatId) {
   try {
     const config = await getSystemConfig();
-    if (!config?.channelId) return;
+    const db = getDb();
 
-    const db      = getDb();
     const msgSnap = await db.collection('sessions').doc(session.id)
       .collection('messages').get();
     const msgs = msgSnap.docs
       .map(d => d.data())
       .sort((a, b) => (a.timestamp?.toMillis?.() || 0) - (b.timestamp?.toMillis?.() || 0));
 
-    // Forward videos (<10MB) to channel
-    for (const m of msgs) {
-      if (m.type === 'video' && m.telegramMessageId) {
-        await bot.api.forwardMessage(config.channelId, custChatId, m.telegramMessageId).catch(() => {});
-      }
-    }
-
-    const pdfPath    = await generateSessionPDF(session, msgs);
+    // Generate PDF
+    const pdfPath = await generateSessionPDF(session, msgs);
     const workerSnap = session.workerId
       ? await db.collection('users').doc(session.workerId).get() : null;
-    const caption    = `📋 *Session Report*\n👤 User: ${session.customerTelegramId}\n👷 Agent: ${workerSnap?.data()?.name || '—'}\n💬 Messages: ${msgs.length}`;
+    const caption = `📋 *Session Report*\n👤 User: @${session.customerUsername || session.customerTelegramId}\n👷 Agent: ${workerSnap?.data()?.name || '—'}\n💬 Messages: ${msgs.length}`;
 
-    await bot.api.sendDocument(config.channelId, new InputFile(pdfPath), {
-      caption, parse_mode: 'Markdown'
-    });
+    // Send PDF to channel if configured
+    if (config?.channelId) {
+      // Forward videos (<10MB) to channel
+      for (const m of msgs) {
+        if (m.type === 'video' && m.telegramMessageId) {
+          await bot.api.forwardMessage(config.channelId, custChatId, m.telegramMessageId).catch(() => {});
+        }
+      }
+      await bot.api.sendDocument(config.channelId, new InputFile(pdfPath), {
+        caption, parse_mode: 'Markdown'
+      });
+    }
+
+    // Also send PDF directly to customer's Telegram as transcript
+    try {
+      await bot.api.sendDocument(custChatId, new InputFile(pdfPath), {
+        caption: `📋 *Chat Transcript*\nThank you for contacting us!`,
+        parse_mode: 'Markdown'
+      });
+    } catch (e) { console.error('send transcript to customer error:', e.message); }
+
     fs.unlink(pdfPath, () => {});
+
+    // Delete all chats documents for this session from Firebase
+    const chatsSnap = await db.collection('chats')
+      .where('sessionId', '==', session.id).get();
+    const batch = db.batch();
+    chatsSnap.docs.forEach(d => batch.delete(d.ref));
+    if (!chatsSnap.empty) await batch.commit();
+
   } catch (err) { console.error('dispatchReport error:', err.message); }
 }
 
-// ─── Relay customer → Firestore + notify worker on Telegram ─────────────────
+// ─── Relay customer → Firestore chats collection (NO Telegram forward) ─────────
 async function relayToWorker(ctx, session) {
   const msg = ctx.message;
 
   let data = {
     from: 'customer', sessionId: session.id,
-    senderName: ctx.from.first_name || 'Customer',
+    senderName: ctx.from.first_name || ctx.from.username || 'Customer',
     telegramMessageId: msg.message_id
   };
 
@@ -277,18 +296,20 @@ async function relayToWorker(ctx, session) {
 
   // Clean undefined values
   Object.keys(data).forEach(k => data[k] === undefined && delete data[k]);
+
+  // Save to sessions subcollection (existing flow)
   await addMessage(session.id, data);
 
-  // ✅ FIX: Also forward text to worker's Telegram so they get a notification
-  //    even when the web dashboard is closed. Worker can reply only via dashboard.
-  if (session.workerTelegramId && data.type === 'text') {
-    const customerName = ctx.from.first_name || `User ${String(ctx.chat.id).slice(-4)}`;
-    await bot.api.sendMessage(
-      session.workerTelegramId,
-      `💬 *${customerName}*: ${data.content}`,
-      { parse_mode: 'Markdown' }
-    ).catch(() => {});
-  }
+  // Also save to top-level 'chats' collection for worker chat dashboard
+  const db = getDb();
+  await db.collection('chats').add({
+    ...data,
+    workerId: session.workerId,
+    customerTelegramId: String(ctx.chat.id),
+    customerUsername: ctx.from.username || '',
+    customerFirstName: ctx.from.first_name || '',
+    timestamp: admin.firestore.FieldValue.serverTimestamp()
+  });
 }
 
 async function tgFileUrl(fileId) {
@@ -422,11 +443,23 @@ async function sendWorkerMessage(sessionId, content) {
   const workerSnap = await db.collection('users').doc(s.workerId).get();
   const workerName = workerSnap.data()?.name || 'Agent';
 
-  // Save message to Firestore (web dashboard will display it)
-  await addMessage(sessionId, {
+  const msgData = {
     from: 'worker', sessionId,
     senderName: workerName,
-    type: 'text', content
+    type: 'text', content,
+    workerId: s.workerId,
+    customerTelegramId: s.customerTelegramId,
+    customerUsername: s.customerUsername || '',
+    customerFirstName: s.customerFirstName || '',
+  };
+
+  // Save to sessions subcollection (web dashboard chat view)
+  await addMessage(sessionId, msgData);
+
+  // Also save to top-level 'chats' collection for worker chat dashboard
+  await db.collection('chats').add({
+    ...msgData,
+    timestamp: admin.firestore.FieldValue.serverTimestamp()
   });
 
   // ✅ Reset agent-inactivity timer on every agent reply

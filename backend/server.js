@@ -35,6 +35,7 @@ app.use('/api', (req, res, next) => {
 
 app.use('/api/auth',      require('./routes/auth'));
 app.use('/api/sessions',  require('./routes/sessions'));
+app.use('/api/chats',     require('./routes/chats'));
 app.use('/api/workers',   require('./routes/workers'));
 app.use('/api/languages', require('./routes/languages'));
 app.use('/api/settings',  require('./routes/settings'));
