@@ -52,7 +52,7 @@ export default function Settings() {
     return (
       <Layout title="Settings">
         <div className="flex items-center justify-center py-24">
-          <Loader2 className="w-6 h-6 animate-spin text-brand-400" />
+          <Loader2 className="w-6 h-6 animate-spin text-[#4d9fe0]" />
         </div>
       </Layout>
     );
@@ -64,9 +64,9 @@ export default function Settings() {
 
         {/* General */}
         <div className="card p-6">
-          <div className="flex items-center gap-2.5 mb-5 pb-4 border-b border-white/5">
-            <Settings2 className="w-4 h-4 text-brand-400" />
-            <h2 className="font-semibold text-white text-sm">General</h2>
+          <div className="flex items-center gap-2.5 mb-5 pb-4 border-b border-[#3a4040]">
+            <Settings2 className="w-4 h-4 text-[#4d9fe0]" />
+            <h2 className="font-semibold text-[#ffffff] text-sm">General</h2>
           </div>
           <form onSubmit={saveGeneral} className="space-y-4">
             <div>
@@ -90,10 +90,10 @@ export default function Settings() {
 
         {/* SMTP */}
         <div className="card p-6">
-          <div className="flex items-center gap-2.5 mb-5 pb-4 border-b border-white/5">
-            <Mail className="w-4 h-4 text-brand-400" />
+          <div className="flex items-center gap-2.5 mb-5 pb-4 border-b border-[#3a4040]">
+            <Mail className="w-4 h-4 text-[#4d9fe0]" />
             <div>
-              <h2 className="font-semibold text-white text-sm">SMTP Email</h2>
+              <h2 className="font-semibold text-[#ffffff] text-sm">SMTP Email</h2>
               <p className="text-xs text-slate-500">Required for email verification and email-based password resets</p>
             </div>
           </div>
@@ -140,9 +140,9 @@ export default function Settings() {
 
         {/* System info */}
         <div className="card p-6">
-          <div className="flex items-center gap-2.5 mb-4 pb-4 border-b border-white/5">
-            <Shield className="w-4 h-4 text-brand-400" />
-            <h2 className="font-semibold text-white text-sm">System Info</h2>
+          <div className="flex items-center gap-2.5 mb-4 pb-4 border-b border-[#3a4040]">
+            <Shield className="w-4 h-4 text-[#4d9fe0]" />
+            <h2 className="font-semibold text-[#ffffff] text-sm">System Info</h2>
           </div>
           <div className="space-y-2">
             {[
@@ -150,9 +150,9 @@ export default function Settings() {
               { label: 'SMTP Enabled',  value: config?.smtp?.host ? '✅ Configured' : '❌ Not configured' },
               { label: 'Bot Status',    value: '🟢 Running' },
             ].map(item => (
-              <div key={item.label} className="flex justify-between py-2 border-b border-white/5 last:border-0 text-sm">
+              <div key={item.label} className="flex justify-between py-2 border-b border-[#3a4040] last:border-0 text-sm">
                 <span className="text-slate-400">{item.label}</span>
-                <span className="text-white">{item.value}</span>
+                <span className="text-[#ffffff]">{item.value}</span>
               </div>
             ))}
           </div>

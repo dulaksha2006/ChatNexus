@@ -47,7 +47,7 @@ export default function Sessions() {
           {['all', 'active', 'closed'].map(f => (
             <button key={f} onClick={() => setFilter(f)}
               className={clsx('px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize',
-                filter === f ? 'bg-brand-500 text-white' : 'bg-surface-700 text-slate-400 hover:text-white border border-white/5')}>
+                filter === f ? 'bg-[#1474d4] text-[#ffffff]' : 'bg-surface-700 text-slate-400 hover:text-[#ffffff] border border-[#3a4040]')}>
               {f}
             </button>
           ))}
@@ -58,7 +58,7 @@ export default function Sessions() {
       <div className="card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-white/5">
+            <tr className="border-b border-[#3a4040]">
               {['Session', 'Customer', user.role === 'admin' && 'Worker', 'Language', 'Status', 'Created'].filter(Boolean).map(h => (
                 <th key={h} className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-5 py-3.5">{h}</th>
               ))}
@@ -77,7 +77,7 @@ export default function Sessions() {
                 </td>
               </tr>
             ) : filtered.map(s => (
-              <tr key={s.id} className="border-b border-white/5 last:border-0 hover:bg-white/2 transition-colors">
+              <tr key={s.id} className="border-b border-[#3a4040] last:border-0 hover:bg-white/2 transition-colors">
                 <td className="px-5 py-3.5">
                   <span className="font-mono text-xs text-slate-400">#{s.id.slice(-8)}</span>
                 </td>
@@ -87,7 +87,7 @@ export default function Sessions() {
                       <User className="w-3.5 h-3.5 text-slate-400" />
                     </div>
                     <div>
-                      <p className="text-white text-xs font-medium">{s.customerFirstName || 'Customer'}</p>
+                      <p className="text-[#ffffff] text-xs font-medium">{s.customerFirstName || 'Customer'}</p>
                       <p className="text-slate-500 text-xs">ID: {s.customerTelegramId}</p>
                     </div>
                   </div>
@@ -96,7 +96,7 @@ export default function Sessions() {
                   <td className="px-5 py-3.5 text-xs text-slate-300">{s.workerName || '—'}</td>
                 )}
                 <td className="px-5 py-3.5">
-                  <span className="text-xs bg-surface-700 border border-white/5 px-2 py-0.5 rounded-full text-slate-300 uppercase">{s.language || 'en'}</span>
+                  <span className="text-xs bg-surface-700 border border-[#3a4040] px-2 py-0.5 rounded-full text-slate-300 uppercase">{s.language || 'en'}</span>
                 </td>
                 <td className="px-5 py-3.5">
                   <span className={clsx('text-xs px-2.5 py-1 rounded-full border',

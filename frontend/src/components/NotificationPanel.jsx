@@ -53,10 +53,10 @@ export default function NotificationPanel() {
   return (
     <div className="relative">
       <button onClick={() => setOpen(o => !o)}
-        className="relative p-1.5 rounded-md text-[#6e7681] hover:text-[#e6edf3] hover:bg-[#21262d] transition-all">
+        className="relative p-1.5 rounded-md text-[#6b7878] hover:text-[#ffffff] hover:bg-[#323838] transition-all">
         <Bell className="w-4 h-4" />
         {unread > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#da3633] rounded-full text-[9px] font-bold text-white flex items-center justify-center">
+          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#e05050] rounded-full text-[9px] font-bold text-[#ffffff] flex items-center justify-center">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
@@ -65,14 +65,14 @@ export default function NotificationPanel() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-8 z-50 w-80 bg-[#161b22] border border-[#30363d] rounded-md shadow-overlay animate-slide-up">
+          <div className="absolute right-0 top-8 z-50 w-80 bg-[#2d3333] border border-[#3a4040] rounded-md shadow-overlay animate-slide-up">
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#21262d]">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#323838]">
               <div className="flex items-center gap-2">
-                <Bell className="w-3.5 h-3.5 text-[#58a6ff]" />
-                <span className="text-sm font-medium text-[#e6edf3]">Notifications</span>
+                <Bell className="w-3.5 h-3.5 text-[#4d9fe0]" />
+                <span className="text-sm font-medium text-[#ffffff]">Notifications</span>
                 {unread > 0 && (
-                  <span className="text-[10px] bg-[#da3633]/20 text-[#f85149] border border-[#da3633]/30 rounded-full px-1.5 py-0.5 font-medium">
+                  <span className="text-[10px] bg-[#e05050]/20 text-[#f06060] border border-[#e05050]/30 rounded-full px-1.5 py-0.5 font-medium">
                     {unread} new
                   </span>
                 )}
@@ -80,24 +80,24 @@ export default function NotificationPanel() {
               <div className="flex items-center gap-1">
                 {unread > 0 && (
                   <button onClick={markAllRead} disabled={marking}
-                    className="text-xs text-[#58a6ff] hover:underline flex items-center gap-1 px-2 py-1">
+                    className="text-xs text-[#4d9fe0] hover:underline flex items-center gap-1 px-2 py-1">
                     {marking ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCheck className="w-3 h-3" />}
                     Mark all read
                   </button>
                 )}
                 <button onClick={() => setOpen(false)}
-                  className="p-1 rounded-md text-[#6e7681] hover:text-[#e6edf3] hover:bg-[#21262d] transition-all">
+                  className="p-1 rounded-md text-[#6b7878] hover:text-[#ffffff] hover:bg-[#323838] transition-all">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
 
             {/* List */}
-            <div className="max-h-80 overflow-y-auto divide-y divide-[#21262d]">
+            <div className="max-h-80 overflow-y-auto divide-y divide-[#323838]">
               {notifs.length === 0 ? (
                 <div className="flex flex-col items-center py-8 text-center px-4">
-                  <Bell className="w-6 h-6 text-[#30363d] mb-2" />
-                  <p className="text-xs text-[#6e7681]">No notifications yet</p>
+                  <Bell className="w-6 h-6 text-[#3a4040] mb-2" />
+                  <p className="text-xs text-[#6b7878]">No notifications yet</p>
                 </div>
               ) : notifs.map(n => {
                 const ts = n.createdAt?.toDate?.() || new Date();
@@ -105,21 +105,21 @@ export default function NotificationPanel() {
                   <div key={n.id}
                     className={clsx(
                       'px-4 py-3 transition-colors',
-                      !n.read ? 'bg-[#1f6feb]/5 hover:bg-[#1f6feb]/10' : 'hover:bg-[#21262d]'
+                      !n.read ? 'bg-[#1474d4]/5 hover:bg-[#1474d4]/10' : 'hover:bg-[#323838]'
                     )}>
                     <div className="flex items-start gap-2.5">
-                      {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-[#58a6ff] mt-1.5 shrink-0" />}
+                      {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-[#4d9fe0] mt-1.5 shrink-0" />}
                       {n.read && <span className="w-1.5 h-1.5 shrink-0" />}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5 mb-0.5">
-                          <span className="text-xs font-medium text-[#8b949e]">{n.sentByName || 'Admin'}</span>
-                          <span className="text-[10px] text-[#6e7681]">· {format(ts, 'MMM d, HH:mm')}</span>
+                          <span className="text-xs font-medium text-[#a8b4b4]">{n.sentByName || 'Admin'}</span>
+                          <span className="text-[10px] text-[#6b7878]">· {format(ts, 'MMM d, HH:mm')}</span>
                         </div>
-                        <p className="text-sm text-[#e6edf3] whitespace-pre-wrap break-words">{n.message}</p>
+                        <p className="text-sm text-[#ffffff] whitespace-pre-wrap break-words">{n.message}</p>
                       </div>
                       {!n.read && (
                         <button onClick={() => markOne(n.id)}
-                          className="shrink-0 p-1 rounded-md text-[#6e7681] hover:text-[#3fb950] hover:bg-[#238636]/10 transition-all mt-0.5">
+                          className="shrink-0 p-1 rounded-md text-[#6b7878] hover:text-[#2dcc5e] hover:bg-[#22b14c]/10 transition-all mt-0.5">
                           <Check className="w-3 h-3" />
                         </button>
                       )}

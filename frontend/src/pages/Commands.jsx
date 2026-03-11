@@ -22,14 +22,14 @@ function ShowInListToggle({ checked, onChange }) {
       <div onClick={onChange}
         className={clsx(
           'w-8 h-4 rounded-full transition-all relative',
-          checked ? 'bg-brand-500' : 'bg-zinc-700'
+          checked ? 'bg-[#1474d4]' : 'bg-zinc-700'
         )}>
         <span className={clsx(
           'absolute top-0.5 w-3 h-3 bg-white rounded-full shadow transition-all',
           checked ? 'left-[18px]' : 'left-0.5'
         )} />
       </div>
-      <span className="text-xs text-zinc-400">Show in Telegram command list</span>
+      <span className="text-xs text-[#a8b4b4]">Show in Telegram command list</span>
     </label>
   );
 }
@@ -40,23 +40,23 @@ function CommandForm({ form, menus, onChange, onSave, onCancel, saving }) {
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs text-zinc-400 mb-1">Command</label>
+          <label className="block text-xs text-[#a8b4b4] mb-1">Command</label>
           <div className="flex items-center gap-1">
-            <span className="text-zinc-500 text-sm font-mono">/</span>
+            <span className="text-[#6b7878] text-sm font-mono">/</span>
             <input className="input-field font-mono text-sm" placeholder="start"
               value={form.command}
               onChange={e => u('command', e.target.value.replace(/^\//, '').toLowerCase().replace(/\s/g, ''))} />
           </div>
         </div>
         <div>
-          <label className="block text-xs text-zinc-400 mb-1">Button Label</label>
+          <label className="block text-xs text-[#a8b4b4] mb-1">Button Label</label>
           <input className="input-field text-sm" placeholder="Get Started"
             value={form.label} onChange={e => u('label', e.target.value)} />
         </div>
       </div>
 
       <div>
-        <label className="block text-xs text-zinc-400 mb-1">Action</label>
+        <label className="block text-xs text-[#a8b4b4] mb-1">Action</label>
         <select className="input-field text-sm" value={form.action} onChange={e => u('action', e.target.value)}>
           {ACTIONS.map(a => <option key={a.value} value={a.value}>{a.label}</option>)}
         </select>
@@ -64,7 +64,7 @@ function CommandForm({ form, menus, onChange, onSave, onCancel, saving }) {
 
       {form.action === 'send_menu' && (
         <div>
-          <label className="block text-xs text-zinc-400 mb-1">Which Menu?</label>
+          <label className="block text-xs text-[#a8b4b4] mb-1">Which Menu?</label>
           <select className="input-field text-sm" value={form.menuId || ''} onChange={e => u('menuId', e.target.value)}>
             <option value="">— Select menu —</option>
             {menus.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
@@ -74,9 +74,9 @@ function CommandForm({ form, menus, onChange, onSave, onCancel, saving }) {
 
       {form.action === 'custom_text' && (
         <div>
-          <label className="block text-xs text-zinc-400 mb-1">
+          <label className="block text-xs text-[#a8b4b4] mb-1">
             Default Response Text
-            <span className="ml-1 text-zinc-600 font-normal">(override per-language in Languages)</span>
+            <span className="ml-1 text-[#6b7878] font-normal">(override per-language in Languages)</span>
           </label>
           <textarea className="input-field text-sm resize-none" rows={3}
             value={form.responseText || ''} onChange={e => u('responseText', e.target.value)} />
@@ -90,11 +90,11 @@ function CommandForm({ form, menus, onChange, onSave, onCancel, saving }) {
 
       <div className="flex justify-end gap-2 pt-1">
         <button onClick={onCancel}
-          className="px-3 py-1.5 rounded-lg border border-white/10 text-xs text-zinc-400 hover:text-white transition-all">
+          className="px-3 py-1.5 rounded-lg border border-[#3a4040] text-xs text-[#a8b4b4] hover:text-[#ffffff] transition-all">
           Cancel
         </button>
         <button onClick={onSave} disabled={saving}
-          className="px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-xs font-medium transition-all disabled:opacity-50 flex items-center gap-1.5">
+          className="px-3 py-1.5 rounded-lg bg-[#1474d4] hover:bg-[#1266be] text-[#ffffff] text-xs font-medium transition-all disabled:opacity-50 flex items-center gap-1.5">
           {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />} Save
         </button>
       </div>
@@ -134,16 +134,16 @@ function CommandRow({ cmd, menus, onSave, onDelete }) {
   if (!editing) return (
     <div className={clsx(
       'flex items-center gap-3 px-4 py-3 rounded-xl border transition-all',
-      cmd.active ? 'border-white/10 bg-zinc-900' : 'border-white/5 bg-zinc-950 opacity-50'
+      cmd.active ? 'border-[#3a4040] bg-[#2d3333]' : 'border-[#3a4040] bg-[#252b2b] opacity-50'
     )}>
-      <GripVertical className="w-4 h-4 text-zinc-700 shrink-0" />
-      <code className="text-brand-400 text-sm font-mono w-24 shrink-0">/{cmd.command}</code>
-      <span className="text-white text-sm flex-1">{cmd.label}</span>
+      <GripVertical className="w-4 h-4 text-[#4a5252] shrink-0" />
+      <code className="text-[#4d9fe0] text-sm font-mono w-24 shrink-0">/{cmd.command}</code>
+      <span className="text-[#ffffff] text-sm flex-1">{cmd.label}</span>
       <div className="flex items-center gap-1.5 shrink-0">
         {cmd.showInCommandList !== false
-          ? <span className="text-[10px] text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full">visible</span>
-          : <span className="text-[10px] text-zinc-600 bg-zinc-800 border border-white/5 px-1.5 py-0.5 rounded-full">hidden</span>}
-        <span className="text-xs text-zinc-500 bg-zinc-900 px-2 py-0.5 rounded-full border border-white/5">
+          ? <span className="text-[10px] text-[#22b14c] bg-[#22b14c]/10 border border-[#22b14c]/30 px-1.5 py-0.5 rounded-full">visible</span>
+          : <span className="text-[10px] text-[#6b7878] bg-[#323838] border border-[#3a4040] px-1.5 py-0.5 rounded-full">hidden</span>}
+        <span className="text-xs text-[#6b7878] bg-[#2d3333] px-2 py-0.5 rounded-full border border-[#3a4040]">
           {ACTIONS.find(a => a.value === cmd.action)?.label || cmd.action}
         </span>
       </div>
@@ -151,15 +151,15 @@ function CommandRow({ cmd, menus, onSave, onDelete }) {
         <button onClick={toggleActive}
           className={clsx('text-xs px-2 py-1 rounded-lg border transition-all',
             cmd.active
-              ? 'text-emerald-400 border-emerald-500/25 bg-emerald-500/10 hover:bg-emerald-500/20'
-              : 'text-zinc-500 border-white/10 hover:text-white')}>
+              ? 'text-[#2dcc5e] border-emerald-500/25 bg-[#22b14c]/10 hover:bg-[#22b14c]/20'
+              : 'text-[#6b7878] border-[#3a4040] hover:text-[#ffffff]')}>
           {cmd.active ? 'On' : 'Off'}
         </button>
         <button onClick={() => { setForm({ ...cmd }); setEditing(true); }}
-          className="p-1.5 rounded-lg text-zinc-500 hover:text-brand-400 hover:bg-brand-500/10 transition-all">
+          className="p-1.5 rounded-lg text-[#6b7878] hover:text-[#4d9fe0] hover:bg-[#1474d4]/10 transition-all">
           <Edit3 className="w-3.5 h-3.5" />
         </button>
-        <button onClick={del} className="p-1.5 rounded-lg text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-all">
+        <button onClick={del} className="p-1.5 rounded-lg text-[#6b7878] hover:text-[#e05050] hover:bg-[#e05050]/10 transition-all">
           <Trash2 className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -167,7 +167,7 @@ function CommandRow({ cmd, menus, onSave, onDelete }) {
   );
 
   return (
-    <div className="border border-brand-500/25 bg-brand-500/5 rounded-xl p-4">
+    <div className="border border-brand-500/25 bg-[#1474d4]/5 rounded-xl p-4">
       <CommandForm
         form={form} menus={menus}
         onChange={setForm}
@@ -214,26 +214,26 @@ function MenuEditor({ menu, onSave, onDelete }) {
   }
 
   return (
-    <div className="border border-white/10 bg-zinc-900 rounded-xl overflow-hidden">
+    <div className="border border-[#3a4040] bg-[#2d3333] rounded-xl overflow-hidden">
       <button onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left">
-        <LayoutList className="w-4 h-4 text-brand-400 shrink-0" />
-        <span className="text-white text-sm font-medium flex-1">{menu.title}</span>
-        <span className="text-xs text-zinc-600">{items.length} item{items.length !== 1 ? 's' : ''}</span>
-        {open ? <ChevronUp className="w-4 h-4 text-zinc-600" /> : <ChevronDown className="w-4 h-4 text-zinc-600" />}
+        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#3a4040] transition-colors text-left">
+        <LayoutList className="w-4 h-4 text-[#4d9fe0] shrink-0" />
+        <span className="text-[#ffffff] text-sm font-medium flex-1">{menu.title}</span>
+        <span className="text-xs text-[#6b7878]">{items.length} item{items.length !== 1 ? 's' : ''}</span>
+        {open ? <ChevronUp className="w-4 h-4 text-[#6b7878]" /> : <ChevronDown className="w-4 h-4 text-[#6b7878]" />}
       </button>
 
       {open && (
-        <div className="border-t border-white/5 p-4 space-y-4">
+        <div className="border-t border-[#3a4040] p-4 space-y-4">
           <div>
-            <label className="block text-xs text-zinc-400 mb-1">Menu Title</label>
+            <label className="block text-xs text-[#a8b4b4] mb-1">Menu Title</label>
             <input className="input-field text-sm" value={title} onChange={e => setTitle(e.target.value)} />
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs font-medium text-zinc-500">Items</p>
+            <p className="text-xs font-medium text-[#6b7878]">Items</p>
             {items.map((item, i) => (
-              <div key={i} className="flex gap-2 items-start bg-zinc-950 rounded-lg p-3 border border-white/5">
+              <div key={i} className="flex gap-2 items-start bg-[#252b2b] rounded-lg p-3 border border-[#3a4040]">
                 <div className="flex-1 space-y-2">
                   <input className="input-field text-xs" placeholder="Button label" value={item.label}
                     onChange={e => updateItem(i, 'label', e.target.value)} />
@@ -255,23 +255,23 @@ function MenuEditor({ menu, onSave, onDelete }) {
                   )}
                 </div>
                 <button onClick={() => setItems(p => p.filter((_, idx) => idx !== i))}
-                  className="p-1.5 text-zinc-600 hover:text-red-400 transition-colors shrink-0 mt-0.5">
+                  className="p-1.5 text-[#6b7878] hover:text-[#e05050] transition-colors shrink-0 mt-0.5">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             ))}
             <button onClick={addItem}
-              className="w-full py-2 border border-dashed border-white/10 rounded-lg text-xs text-zinc-600 hover:text-white hover:border-white/20 transition-all flex items-center justify-center gap-1.5">
+              className="w-full py-2 border border-dashed border-[#3a4040] rounded-lg text-xs text-[#6b7878] hover:text-[#ffffff] hover:border-white/20 transition-all flex items-center justify-center gap-1.5">
               <Plus className="w-3 h-3" /> Add Item
             </button>
           </div>
 
           <div className="flex justify-between pt-1">
-            <button onClick={del} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-all">
+            <button onClick={del} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-[#e05050] bg-[#e05050]/10 hover:bg-[#e05050]/20 border border-[#e05050]/30 transition-all">
               <Trash2 className="w-3 h-3" /> Delete
             </button>
             <button onClick={save} disabled={saving}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-xs font-medium transition-all disabled:opacity-50">
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1474d4] hover:bg-[#1266be] text-[#ffffff] text-xs font-medium transition-all disabled:opacity-50">
               {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />} Save Menu
             </button>
           </div>
@@ -328,26 +328,26 @@ export default function Commands() {
         {[['commands', Terminal, 'Commands'], ['menus', LayoutList, 'Menus']].map(([key, Icon, label]) => (
           <button key={key} onClick={() => setTab(key)}
             className={clsx('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all',
-              tab === key ? 'bg-brand-500 text-white' : 'bg-zinc-900 text-zinc-400 hover:text-white border border-white/5')}>
+              tab === key ? 'bg-[#1474d4] text-[#ffffff]' : 'bg-[#2d3333] text-[#a8b4b4] hover:text-[#ffffff] border border-[#3a4040]')}>
             <Icon className="w-4 h-4" />{label}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-16"><Loader2 className="w-5 h-5 animate-spin text-brand-400" /></div>
+        <div className="flex justify-center py-16"><Loader2 className="w-5 h-5 animate-spin text-[#4d9fe0]" /></div>
       ) : tab === 'commands' ? (
         <div className="space-y-3">
           <div className="flex justify-between items-center">
-            <p className="text-sm text-zinc-500">{commands.length} command{commands.length !== 1 ? 's' : ''}</p>
+            <p className="text-sm text-[#6b7878]">{commands.length} command{commands.length !== 1 ? 's' : ''}</p>
             <button onClick={() => setShowAdd(!showAdd)} className="btn-primary text-sm flex items-center gap-2">
               <Plus className="w-4 h-4" /> Add Command
             </button>
           </div>
 
           {showAdd && (
-            <div className="bg-zinc-950 border border-brand-500/20 rounded-xl p-4 animate-slide-up">
-              <p className="text-xs font-semibold text-zinc-400 mb-3">New Command</p>
+            <div className="bg-[#252b2b] border border-[#1474d4]/25 rounded-xl p-4 animate-slide-up">
+              <p className="text-xs font-semibold text-[#a8b4b4] mb-3">New Command</p>
               <CommandForm
                 form={newCmd} menus={menus}
                 onChange={setNewCmd}
@@ -361,7 +361,7 @@ export default function Commands() {
           {commands.length === 0 && !showAdd ? (
             <div className="flex flex-col items-center py-16 text-center">
               <Terminal className="w-8 h-8 text-zinc-800 mb-3" />
-              <p className="text-sm text-zinc-500">No commands yet</p>
+              <p className="text-sm text-[#6b7878]">No commands yet</p>
             </div>
           ) : (
             commands.map(cmd => (
@@ -375,7 +375,7 @@ export default function Commands() {
       ) : (
         <div className="space-y-3">
           <div className="flex justify-between items-center">
-            <p className="text-sm text-zinc-500">{menus.length} menu{menus.length !== 1 ? 's' : ''}</p>
+            <p className="text-sm text-[#6b7878]">{menus.length} menu{menus.length !== 1 ? 's' : ''}</p>
             <button onClick={addMenu} className="btn-primary text-sm flex items-center gap-2">
               <Plus className="w-4 h-4" /> New Menu
             </button>
@@ -383,7 +383,7 @@ export default function Commands() {
           {menus.length === 0 ? (
             <div className="flex flex-col items-center py-16 text-center">
               <LayoutList className="w-8 h-8 text-zinc-800 mb-3" />
-              <p className="text-sm text-zinc-500">No menus yet</p>
+              <p className="text-sm text-[#6b7878]">No menus yet</p>
             </div>
           ) : (
             menus.map(menu => (
