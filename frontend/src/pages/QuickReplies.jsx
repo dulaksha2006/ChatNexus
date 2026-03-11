@@ -46,19 +46,19 @@ export default function QuickReplies() {
     <Layout title="Quick Replies">
       <div className="max-w-2xl">
         <div className="card p-5 mb-4">
-          <h3 className="text-sm font-semibold text-[#ffffff] mb-1 flex items-center gap-2">
-            <Zap className="w-4 h-4 text-[#4d9fe0]" /> Add Quick Reply
+          <h3 className="text-sm font-semibold text-white mb-1 flex items-center gap-2">
+            <Zap className="w-4 h-4 text-white" /> Add Quick Reply
           </h3>
-          <p className="text-xs text-[#6b7878] mb-4">Workers can insert these with one click while chatting.</p>
+          <p className="text-xs text-white mb-4">Workers can insert these with one click while chatting.</p>
           <div className="space-y-3">
             <input
-              className="w-full bg-[#2d3333] border border-[#3a4040] rounded-xl px-4 py-2.5 text-sm text-[#ffffff] placeholder-zinc-600 outline-none focus:border-brand-500/50"
+              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none focus:border-brand-500/50"
               placeholder="Short label (optional, e.g. 'Greeting')"
               value={label}
               onChange={e => setLabel(e.target.value)}
             />
             <textarea
-              className="w-full bg-[#2d3333] border border-[#3a4040] rounded-xl px-4 py-2.5 text-sm text-[#ffffff] placeholder-zinc-600 outline-none focus:border-brand-500/50 resize-none"
+              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] rounded px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none focus:border-brand-500/50 resize-none"
               placeholder="Message text…"
               rows={3}
               value={text}
@@ -67,7 +67,7 @@ export default function QuickReplies() {
             <button
               onClick={add}
               disabled={saving || !text.trim()}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1474d4] hover:bg-[#1266be] text-[#ffffff] text-sm font-medium transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded bg-white hover:bg-white text-white text-sm font-medium transition-all disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
               Add Reply
@@ -76,22 +76,22 @@ export default function QuickReplies() {
         </div>
 
         <div className="card p-5">
-          <h3 className="text-sm font-semibold text-[#ffffff] mb-4">Existing Quick Replies</h3>
+          <h3 className="text-sm font-semibold text-white mb-4">Existing Quick Replies</h3>
           {loading ? (
-            <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-[#4d9fe0]" /></div>
+            <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-white" /></div>
           ) : replies.length === 0 ? (
-            <p className="text-sm text-[#6b7878] text-center py-4">No quick replies yet</p>
+            <p className="text-sm text-white text-center py-4">No quick replies yet</p>
           ) : (
             <div className="space-y-2">
               {replies.map(r => (
-                <div key={r.id} className="flex items-start gap-3 p-3 bg-[#2d3333]/60 rounded-xl border border-[#3a4040]">
+                <div key={r.id} className="flex items-start gap-3 p-3 bg-[#0a0a0a]/60 rounded border border-[#1a1a1a]">
                   <div className="flex-1 min-w-0">
-                    {r.label && <p className="text-xs font-semibold text-[#4d9fe0] mb-0.5">{r.label}</p>}
-                    <p className="text-sm text-[#d0d8d8] break-words">{r.text}</p>
+                    {r.label && <p className="text-xs font-semibold text-white mb-0.5">{r.label}</p>}
+                    <p className="text-sm text-white break-words">{r.text}</p>
                   </div>
                   <button
                     onClick={() => remove(r.id)}
-                    className="p-1.5 rounded-lg text-[#6b7878] hover:text-[#e05050] hover:bg-[#e05050]/10 transition-all shrink-0"
+                    className="p-1.5 rounded text-white hover:text-white hover:bg-white/10 transition-all shrink-0"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

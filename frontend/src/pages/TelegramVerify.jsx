@@ -48,37 +48,37 @@ export default function TelegramVerify() {
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="w-full max-w-md animate-fade-in">
         <div className="text-center mb-8">
-          <div className="inline-flex w-14 h-14 rounded-2xl bg-[#1474d4]/15 border border-brand-500/25 items-center justify-center mb-4">
-            <MessageCircle className="w-7 h-7 text-[#4d9fe0]" />
+          <div className="inline-flex w-14 h-14 rounded bg-white/15 border border-brand-500/25 items-center justify-center mb-4">
+            <MessageCircle className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-[#ffffff] mb-1">Link Your Telegram</h1>
+          <h1 className="text-2xl font-bold text-white mb-1">Link Your Telegram</h1>
           <p className="text-slate-400 text-sm">One-time setup to receive sessions</p>
         </div>
 
-        <div className="bg-surface-800 border border-[#3a4040] rounded-2xl p-6 space-y-6">
+        <div className="bg-surface-800 border border-[#1a1a1a] rounded p-6 space-y-6">
           {loading ? (
             <div className="flex justify-center py-6">
-              <Loader2 className="w-6 h-6 animate-spin text-[#4d9fe0]" />
+              <Loader2 className="w-6 h-6 animate-spin text-white" />
             </div>
           ) : (
             <>
               {/* Step 1 */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="w-5 h-5 rounded-full bg-[#1474d4] text-[#ffffff] text-xs flex items-center justify-center font-bold shrink-0">1</span>
-                  <p className="text-sm font-medium text-[#ffffff]">
+                  <span className="w-5 h-5 rounded bg-white text-white text-xs flex items-center justify-center font-bold shrink-0">1</span>
+                  <p className="text-sm font-medium text-white">
                     Open this bot on Telegram
                   </p>
                 </div>
                 {botUsername ? (
                   <a href={`https://t.me/${botUsername}`} target="_blank" rel="noreferrer"
-                    className="flex items-center gap-3 p-3 rounded-xl bg-[#1474d4]/10 border border-[#1474d4]/25 hover:bg-[#1474d4]/15 transition-all group">
-                    <MessageCircle className="w-5 h-5 text-[#4d9fe0] shrink-0" />
-                    <span className="text-[#4d9fe0] font-mono text-sm font-medium">@{botUsername}</span>
+                    className="flex items-center gap-3 p-3 rounded bg-white/10 border border-[#1a1a1a]/25 hover:bg-white/15 transition-all group">
+                    <MessageCircle className="w-5 h-5 text-white shrink-0" />
+                    <span className="text-white font-mono text-sm font-medium">@{botUsername}</span>
                     <span className="text-xs text-slate-500 group-hover:text-slate-400 ml-auto">Open →</span>
                   </a>
                 ) : (
-                  <p className="text-sm text-slate-400 bg-surface-700 rounded-lg p-3 border border-[#3a4040]">
+                  <p className="text-sm text-slate-400 bg-surface-700 rounded p-3 border border-[#1a1a1a]">
                     Open your support bot on Telegram
                   </p>
                 )}
@@ -87,22 +87,22 @@ export default function TelegramVerify() {
               {/* Step 2 */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="w-5 h-5 rounded-full bg-[#1474d4] text-[#ffffff] text-xs flex items-center justify-center font-bold shrink-0">2</span>
-                  <p className="text-sm font-medium text-[#ffffff]">Send this OTP to the bot</p>
+                  <span className="w-5 h-5 rounded bg-white text-white text-xs flex items-center justify-center font-bold shrink-0">2</span>
+                  <p className="text-sm font-medium text-white">Send this OTP to the bot</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 bg-black border border-[#3a4040] rounded-xl px-5 py-4 text-center">
-                    <span className="font-mono text-3xl font-bold tracking-[0.3em] text-[#ffffff]">
+                  <div className="flex-1 bg-black border border-[#1a1a1a] rounded px-5 py-4 text-center">
+                    <span className="font-mono text-3xl font-bold tracking-[0.3em] text-white">
                       {otp || '------'}
                     </span>
                   </div>
                   <div className="flex flex-col gap-2">
                     <button onClick={copyOtp} disabled={!otp}
-                      className="p-3 rounded-xl bg-[#323838] hover:bg-[#3a4040] border border-[#3a4040] text-slate-300 hover:text-[#ffffff] transition-all">
+                      className="p-3 rounded bg-[#0a0a0a] hover:bg-[#111] border border-[#1a1a1a] text-slate-300 hover:text-white transition-all">
                       <Copy className="w-4 h-4" />
                     </button>
                     <button onClick={requestOtp} disabled={requesting}
-                      className="p-3 rounded-xl bg-[#323838] hover:bg-[#3a4040] border border-[#3a4040] text-slate-300 hover:text-[#ffffff] transition-all">
+                      className="p-3 rounded bg-[#0a0a0a] hover:bg-[#111] border border-[#1a1a1a] text-slate-300 hover:text-white transition-all">
                       {requesting ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
                     </button>
                   </div>
@@ -114,9 +114,9 @@ export default function TelegramVerify() {
 
               {/* Divider */}
               <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-[#323838]" />
+                <div className="flex-1 h-px bg-[#0a0a0a]" />
                 <span className="text-xs text-slate-600">or verify manually</span>
-                <div className="flex-1 h-px bg-[#323838]" />
+                <div className="flex-1 h-px bg-[#0a0a0a]" />
               </div>
 
               {/* Manual entry */}
@@ -124,7 +124,7 @@ export default function TelegramVerify() {
                 <p className="text-xs text-slate-400 mb-2">Already sent the OTP? Enter it here:</p>
                 <div className="flex gap-2">
                   <input
-                    className="flex-1 bg-black border border-[#3a4040] rounded-lg px-4 py-2.5 text-sm text-[#ffffff] placeholder-slate-600 font-mono tracking-widest focus:outline-none focus:border-brand-500/50 transition-all text-center"
+                    className="flex-1 bg-black border border-[#1a1a1a] rounded px-4 py-2.5 text-sm text-white placeholder-slate-600 font-mono tracking-widest focus:outline-none focus:border-brand-500/50 transition-all text-center"
                     placeholder="123456"
                     maxLength={6}
                     value={manualOtp}
@@ -132,7 +132,7 @@ export default function TelegramVerify() {
                     onKeyDown={e => e.key === 'Enter' && verifyManual()}
                   />
                   <button onClick={verifyManual} disabled={verifying || manualOtp.length !== 6}
-                    className="bg-[#1474d4] hover:bg-[#1266be] text-[#ffffff] px-4 py-2 rounded-lg text-sm font-medium transition-all disabled:opacity-40 flex items-center gap-2">
+                    className="bg-white hover:bg-white text-white px-4 py-2 rounded text-sm font-medium transition-all disabled:opacity-40 flex items-center gap-2">
                     {verifying ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                     Verify
                   </button>

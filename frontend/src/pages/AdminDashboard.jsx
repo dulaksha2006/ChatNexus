@@ -9,19 +9,19 @@ import clsx from 'clsx';
 
 function StatCard({ icon: Icon, label, value, sub, color = 'brand' }) {
   const colors = {
-    brand:  'from-brand-500/15  to-brand-600/5  border-[#1474d4]/25  text-[#4d9fe0]',
+    brand:  'from-brand-500/15  to-brand-600/5  border-[#1a1a1a]/25  text-white',
     green:  'from-accent-500/15 to-accent-600/5 border-accent-500/20 text-accent-400',
-    amber:  'from-amber-500/15  to-amber-600/5  border-[#d4a017]/30  text-[#f0ba1c]',
+    amber:  'from-amber-500/15  to-amber-600/5  border-[#d29922]/30  text-white',
     purple: 'from-purple-500/15 to-purple-600/5 border-purple-500/20 text-purple-400',
   };
   return (
     <div className={`card p-5 bg-gradient-to-br ${colors[color]} animate-fade-in`}>
       <div className="flex items-start justify-between mb-4">
-        <div className="p-2 rounded-lg bg-[#323838]">
+        <div className="p-2 rounded bg-[#0a0a0a]">
           <Icon className="w-4 h-4" />
         </div>
       </div>
-      <p className="text-2xl font-display font-bold text-[#ffffff] mb-0.5">{value ?? '—'}</p>
+      <p className="text-2xl font-display font-bold text-white mb-0.5">{value ?? '—'}</p>
       <p className="text-xs font-medium text-slate-300">{label}</p>
       {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
     </div>
@@ -31,10 +31,10 @@ function StatCard({ icon: Icon, label, value, sub, color = 'brand' }) {
 function SessionRow({ session }) {
   const ts = session.createdAt?.toDate?.() || new Date();
   return (
-    <div className="flex items-center gap-4 py-3 border-b border-[#3a4040] last:border-0 group hover:bg-[#3a4040] px-2 -mx-2 rounded-lg transition-colors">
-      <div className="w-2 h-2 rounded-full bg-[#22b14c] animate-pulse shrink-0" />
+    <div className="flex items-center gap-4 py-3 border-b border-[#1a1a1a] last:border-0 group hover:bg-[#111] px-2 -mx-2 rounded transition-colors">
+      <div className="w-2 h-2 rounded bg-white animate-pulse shrink-0" />
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-[#ffffff] font-medium truncate">
+        <p className="text-sm text-white font-medium truncate">
           Customer #{String(session.customerTelegramId).slice(-6)}
         </p>
         <p className="text-xs text-slate-500">{session.workerName || 'Unassigned'}</p>
@@ -42,10 +42,10 @@ function SessionRow({ session }) {
       <div className="text-right shrink-0">
         <p className="text-xs text-slate-400">{formatDistanceToNow(ts, { addSuffix: true })}</p>
         <span className={clsx(
-          'text-xs px-2 py-0.5 rounded-full border',
+          'text-xs px-2 py-0.5 rounded border',
           session.status === 'active'
-            ? 'border-emerald-500/30 text-[#2dcc5e] bg-[#22b14c]/10'
-            : 'border-zinc-700 text-[#6b7878] bg-[#2d3333]'
+            ? 'border-emerald-500/30 text-white bg-white/10'
+            : 'border-zinc-700 text-white bg-[#0a0a0a]'
         )}>
           {session.status}
         </span>
@@ -126,12 +126,12 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Active sessions */}
         <div className="card p-5">
-          <h3 className="text-sm font-semibold text-[#ffffff] mb-4 flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-[#4d9fe0]" />
+          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+            <MessageSquare className="w-4 h-4 text-white" />
             Active Sessions
           </h3>
           {sessions.length === 0 ? (
-            <p className="text-sm text-[#6b7878] py-4 text-center">No active sessions</p>
+            <p className="text-sm text-white py-4 text-center">No active sessions</p>
           ) : (
             sessions.map(s => <SessionRow key={s.id} session={s} />)
           )}
@@ -139,32 +139,32 @@ export default function AdminDashboard() {
 
         {/* Worker status */}
         <div className="card p-5">
-          <h3 className="text-sm font-semibold text-[#ffffff] mb-4 flex items-center gap-2">
-            <Users className="w-4 h-4 text-[#4d9fe0]" />
+          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+            <Users className="w-4 h-4 text-white" />
             Worker Status
           </h3>
           {workers.filter(w => w.active).length === 0 ? (
-            <p className="text-sm text-[#6b7878] py-4 text-center">No workers added yet</p>
+            <p className="text-sm text-white py-4 text-center">No workers added yet</p>
           ) : (
             <div className="space-y-2">
               {workers.filter(w => w.active).map(w => (
-                <div key={w.id} className="flex items-center justify-between py-2 border-b border-[#3a4040] last:border-0">
+                <div key={w.id} className="flex items-center justify-between py-2 border-b border-[#1a1a1a] last:border-0">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-[#323838] border border-[#3a4040] flex items-center justify-center text-xs font-bold text-[#ffffff] shrink-0">
+                    <div className="w-7 h-7 rounded bg-[#0a0a0a] border border-[#1a1a1a] flex items-center justify-center text-xs font-bold text-white shrink-0">
                       {(w.name || '?')[0].toUpperCase()}
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-[#ffffff]">{w.name}</p>
-                      <p className="text-[10px] text-[#6b7878]">{w.email}</p>
+                      <p className="text-xs font-medium text-white">{w.name}</p>
+                      <p className="text-[10px] text-white">{w.email}</p>
                     </div>
                   </div>
                   <span className={clsx(
-                    'text-[10px] px-2 py-0.5 rounded-full border font-medium',
+                    'text-[10px] px-2 py-0.5 rounded border font-medium',
                     w.status === 'free'
-                      ? 'border-emerald-500/30 text-[#2dcc5e] bg-[#22b14c]/10'
+                      ? 'border-emerald-500/30 text-white bg-white/10'
                       : w.status === 'busy'
-                        ? 'border-amber-500/30 text-[#f0ba1c] bg-[#d4a017]/12'
-                        : 'border-zinc-700 text-[#6b7878] bg-[#2d3333]'
+                        ? 'border-amber-500/30 text-white bg-[#d29922]/12'
+                        : 'border-zinc-700 text-white bg-[#0a0a0a]'
                   )}>
                     {w.status === 'free' ? 'Online' : w.status === 'busy' ? 'Busy' : 'Offline'}
                   </span>

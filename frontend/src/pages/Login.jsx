@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bot, Loader2, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Loader2, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api';
@@ -8,131 +8,135 @@ import api from '../api';
 export default function Login({ mode: initialMode = 'login' }) {
   const { login } = useAuth();
   const navigate  = useNavigate();
-  const [mode, setMode]     = useState(initialMode);
-  const [loading, setLoading] = useState(false);
-  const [showPass, setShow]   = useState(false);
-  const [form, setForm] = useState({ email: '', password: '', otp: '', newPassword: '' });
-  const u = (k, v) => setForm(p => ({ ...p, [k]: v }));
+  const [mode, setMode]    = useState(initialMode);
+  const [loading, setLoad] = useState(false);
+  const [showPass, setShow] = useState(false);
+  const [form, setForm] = useState({ email:'', password:'', otp:'', newPassword:'' });
+  const u = (k,v) => setForm(p => ({ ...p, [k]:v }));
 
   async function handleLogin(e) {
-    e.preventDefault(); setLoading(true);
+    e.preventDefault(); setLoad(true);
     try {
-      const { user, needsTelegramVerify } = await login(form.email, form.password);
-      if (needsTelegramVerify) navigate('/telegram-verify'); else navigate('/');
+      const { needsTelegramVerify } = await login(form.email, form.password);
+      needsTelegramVerify ? navigate('/telegram-verify') : navigate('/');
     } catch (err) {
-      const code = err.response?.data?.code;
-      if (code === 'EMAIL_UNVERIFIED') toast.error('Please verify your email first.');
-      else toast.error(err.response?.data?.error || 'Login failed');
-    } finally { setLoading(false); }
+      toast.error(err.response?.data?.code === 'EMAIL_UNVERIFIED' ? 'Verify your email first.' : err.response?.data?.error || 'Login failed');
+    } finally { setLoad(false); }
   }
-
   async function handleForgot(e) {
-    e.preventDefault(); setLoading(true);
-    try {
-      const res = await api.post('/auth/forgot-password', { email: form.email });
-      toast.success(`OTP sent via ${res.data.via}`); setMode('reset');
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
-    finally { setLoading(false); }
+    e.preventDefault(); setLoad(true);
+    try { const r = await api.post('/auth/forgot-password', { email:form.email }); toast.success(`OTP sent via ${r.data.via}`); setMode('reset'); }
+    catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
+    finally { setLoad(false); }
   }
-
   async function handleReset(e) {
-    e.preventDefault(); setLoading(true);
-    try {
-      await api.post('/auth/reset-password', { email: form.email, otp: form.otp, newPassword: form.newPassword });
-      toast.success('Password reset! Please log in.'); setMode('login');
-    } catch (err) { toast.error(err.response?.data?.error || 'Reset failed'); }
-    finally { setLoading(false); }
+    e.preventDefault(); setLoad(true);
+    try { await api.post('/auth/reset-password', { email:form.email, otp:form.otp, newPassword:form.newPassword }); toast.success('Password updated!'); setMode('login'); }
+    catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
+    finally { setLoad(false); }
   }
 
-  const titles = { login: 'Sign in', forgot: 'Reset password', reset: 'New password' };
+  const mono = { fontFamily:"'Space Mono', monospace" };
 
   return (
-    <div className="min-h-screen bg-[#252b2b] flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-sm animate-fade-in">
+    <div style={{ minHeight:'100vh', background:'#000', display:'flex', alignItems:'center', justifyContent:'center', padding:'24px' }}>
+      <div style={{ width:'100%', maxWidth:'360px' }} className="animate-fade-in">
 
-        {/* Logo */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2.5 mb-5">
-            <div className="w-9 h-9 rounded-xl bg-[#1474d4] flex items-center justify-center shadow-lg">
-              <Bot className="w-5 h-5 text-[#ffffff]" />
-            </div>
-            <span className="text-xl font-bold text-[#ffffff] tracking-tight">ChatNexus</span>
+        {/* Brand */}
+        <div style={{ textAlign:'center', marginBottom:'32px' }}>
+          <div style={{ ...mono, fontSize:'11px', fontWeight:'700', letterSpacing:'0.14em', textTransform:'uppercase', color:'#555', marginBottom:'12px' }}>
+            // CHATNEXUS
           </div>
-          <h1 className="text-lg font-semibold text-[#ffffff]">{titles[mode]}</h1>
-          <p className="text-sm text-[#6b7878] mt-0.5">
-            {mode === 'login' ? 'Sign in to your account' : mode === 'forgot' ? 'We\'ll send you a reset code' : 'Enter your new password'}
+          <h1 style={{ ...mono, fontSize:'20px', fontWeight:'700', color:'#fff', marginBottom:'6px' }}>
+            {mode==='login' ? 'Sign In' : mode==='forgot' ? 'Reset Password' : 'New Password'}
+          </h1>
+          <p style={{ fontSize:'13px', color:'#555' }}>
+            {mode==='login' ? 'Enter your credentials to continue' : mode==='forgot' ? 'We\'ll send a reset code' : 'Choose your new password'}
           </p>
         </div>
 
-        {/* Form card */}
-        <div className="bg-[#2d3333] border border-[#3a4040] rounded-lg p-5 shadow-overlay">
+        {/* Card */}
+        <div style={{ background:'#0a0a0a', border:'1px solid #1a1a1a', borderRadius:'2px', padding:'28px', position:'relative' }}
+          className="cn-box">
 
           {mode === 'login' && (
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[#a8b4b4] mb-1.5">Email</label>
+            <form onSubmit={handleLogin}>
+              <div style={{ marginBottom:'16px' }}>
+                <label style={{ ...mono, display:'block', fontSize:'9px', letterSpacing:'0.12em', textTransform:'uppercase', color:'#888', marginBottom:'8px' }}>
+                  Email Address
+                </label>
                 <input className="cn-input" type="email" placeholder="you@company.com"
-                  value={form.email} onChange={e => u('email', e.target.value)} required autoFocus />
+                  value={form.email} onChange={e=>u('email',e.target.value)} required autoFocus />
               </div>
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-sm font-medium text-[#a8b4b4]">Password</label>
+              <div style={{ marginBottom:'20px' }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'8px' }}>
+                  <label style={{ ...mono, fontSize:'9px', letterSpacing:'0.12em', textTransform:'uppercase', color:'#888' }}>Password</label>
                   <button type="button" onClick={() => setMode('forgot')}
-                    className="text-xs text-[#1474d4] hover:text-[#4d9fe0] transition-colors">
-                    Forgot password?
+                    style={{ ...mono, fontSize:'9px', letterSpacing:'0.06em', textTransform:'uppercase', color:'#555', background:'none', border:'none', cursor:'pointer', textDecoration:'underline' }}>
+                    Forgot?
                   </button>
                 </div>
-                <div className="relative">
-                  <input className="cn-input pr-10" type={showPass ? 'text' : 'password'} placeholder="••••••••"
-                    value={form.password} onChange={e => u('password', e.target.value)} required />
-                  <button type="button" onClick={() => setShow(p => !p)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7878] hover:text-[#ffffff] transition-colors">
-                    {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                <div style={{ position:'relative' }}>
+                  <input className="cn-input" type={showPass?'text':'password'} placeholder="••••••••" style={{ paddingRight:'40px' }}
+                    value={form.password} onChange={e=>u('password',e.target.value)} required />
+                  <button type="button" onClick={() => setShow(p=>!p)}
+                    style={{ position:'absolute', right:'10px', top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'#555', display:'flex', padding:'2px' }}>
+                    {showPass ? <EyeOff size={14}/> : <Eye size={14}/>}
                   </button>
                 </div>
               </div>
-              <button type="submit" disabled={loading} className="cn-btn-blue w-full py-2 mt-1">
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Sign in'}
+              <button type="submit" disabled={loading} className="cn-btn-primary">
+                {loading ? <Loader2 size={13} className="animate-spin"/> : <><span style={{ fontSize:'11px' }}>→</span> Sign In</>}
               </button>
             </form>
           )}
 
           {mode === 'forgot' && (
-            <form onSubmit={handleForgot} className="space-y-4">
-              <p className="text-xs text-[#6b7878]">Enter your email and we'll send a reset OTP via email or Telegram.</p>
-              <div>
-                <label className="block text-sm font-medium text-[#a8b4b4] mb-1.5">Email</label>
+            <form onSubmit={handleForgot}>
+              <p style={{ fontSize:'13px', color:'#555', marginBottom:'20px', lineHeight:1.6 }}>
+                Enter your email address and we'll send a reset code.
+              </p>
+              <div style={{ marginBottom:'20px' }}>
+                <label style={{ ...mono, display:'block', fontSize:'9px', letterSpacing:'0.12em', textTransform:'uppercase', color:'#888', marginBottom:'8px' }}>Email Address</label>
                 <input className="cn-input" type="email" placeholder="you@company.com"
-                  value={form.email} onChange={e => u('email', e.target.value)} required autoFocus />
+                  value={form.email} onChange={e=>u('email',e.target.value)} required autoFocus />
               </div>
-              <div className="flex gap-2">
-                <button type="button" onClick={() => setMode('login')} className="cn-btn-ghost flex items-center gap-1.5">
-                  <ArrowLeft className="w-3.5 h-3.5" /> Back
+              <div style={{ display:'flex', gap:'8px' }}>
+                <button type="button" className="cn-btn-ghost" onClick={() => setMode('login')} style={{ flex:'0 0 auto', gap:'6px' }}>
+                  <ArrowLeft size={13}/> Back
                 </button>
-                <button type="submit" disabled={loading} className="cn-btn-blue flex-1">
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send OTP'}
+                <button type="submit" disabled={loading} className="cn-btn-primary" style={{ flex:1 }}>
+                  {loading ? <Loader2 size={13} className="animate-spin"/> : 'Send Code'}
                 </button>
               </div>
             </form>
           )}
 
           {mode === 'reset' && (
-            <form onSubmit={handleReset} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[#a8b4b4] mb-1.5">OTP Code</label>
-                <input className="cn-input font-mono tracking-widest text-center text-lg" placeholder="123456" maxLength={6}
-                  value={form.otp} onChange={e => u('otp', e.target.value)} required autoFocus />
+            <form onSubmit={handleReset}>
+              <div style={{ marginBottom:'16px' }}>
+                <label style={{ ...mono, display:'block', fontSize:'9px', letterSpacing:'0.12em', textTransform:'uppercase', color:'#888', marginBottom:'8px' }}>OTP Code</label>
+                <input className="cn-input" placeholder="1 2 3 4 5 6" maxLength={6}
+                  style={{ fontFamily:"'Space Mono', monospace", letterSpacing:'8px', textAlign:'center', fontSize:'18px' }}
+                  value={form.otp} onChange={e=>u('otp',e.target.value)} required autoFocus />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-[#a8b4b4] mb-1.5">New Password</label>
-                <input className="cn-input" type="password" placeholder="Min 8 characters"
-                  value={form.newPassword} onChange={e => u('newPassword', e.target.value)} required />
+              <div style={{ marginBottom:'20px' }}>
+                <label style={{ ...mono, display:'block', fontSize:'9px', letterSpacing:'0.12em', textTransform:'uppercase', color:'#888', marginBottom:'8px' }}>New Password</label>
+                <input className="cn-input" type="password" placeholder="Minimum 8 characters"
+                  value={form.newPassword} onChange={e=>u('newPassword',e.target.value)} required />
               </div>
-              <button type="submit" disabled={loading} className="cn-btn-primary w-full py-2">
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Reset Password'}
+              <button type="submit" disabled={loading} className="cn-btn-primary">
+                {loading ? <Loader2 size={13} className="animate-spin"/> : 'Update Password'}
               </button>
             </form>
           )}
+        </div>
+
+        {/* Footer note */}
+        <div style={{ border:'1px solid #1a1a1a', marginTop:'16px', padding:'14px 20px', textAlign:'center' }}>
+          <span style={{ ...mono, fontSize:'10px', letterSpacing:'0.06em', color:'#333' }}>
+            New account? Contact your administrator.
+          </span>
         </div>
       </div>
     </div>

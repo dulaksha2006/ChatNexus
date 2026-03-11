@@ -10,10 +10,10 @@ import clsx from 'clsx';
 function Modal({ title, onClose, children }) {
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#2d3333] border border-[#3a4040] rounded-md w-full max-w-md animate-slide-up shadow-overlay">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#323838]">
-          <h3 className="font-semibold text-[#ffffff] text-sm">{title}</h3>
-          <button onClick={onClose} className="p-1 rounded-md text-[#6b7878] hover:text-[#ffffff] hover:bg-[#323838] transition-all">
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded w-full max-w-md animate-slide-up ">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#1a1a1a]">
+          <h3 className="font-semibold text-white text-sm">{title}</h3>
+          <button onClick={onClose} className="p-1 rounded text-white hover:text-white hover:bg-[#0a0a0a] transition-all">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -46,23 +46,23 @@ function AddWorkerModal({ onClose, onAdded }) {
     <Modal title="Add Worker" onClose={onClose}>
       <div className="space-y-3">
         <div>
-          <label className="block text-sm font-medium text-[#ffffff] mb-1.5">Full Name</label>
+          <label className="block text-sm font-medium text-white mb-1.5">Full Name</label>
           <input className="gh-input" placeholder="Jane Smith"
             value={form.name} onChange={e => u('name', e.target.value)} autoFocus />
         </div>
         <div>
-          <label className="block text-sm font-medium text-[#ffffff] mb-1.5">Email</label>
+          <label className="block text-sm font-medium text-white mb-1.5">Email</label>
           <input className="gh-input" type="email" placeholder="jane@company.com"
             value={form.email} onChange={e => u('email', e.target.value)} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-[#ffffff] mb-1.5">Password</label>
+          <label className="block text-sm font-medium text-white mb-1.5">Password</label>
           <div className="relative">
             <input className="gh-input pr-10" type={showPass ? 'text' : 'password'} placeholder="Min 8 characters"
               value={form.password} onChange={e => u('password', e.target.value)}
               onKeyDown={e => e.key === 'Enter' && submit()} />
             <button type="button" onClick={() => setShowPass(p => !p)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7878] hover:text-[#ffffff] transition-colors">
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-white hover:text-white transition-colors">
               {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
@@ -96,7 +96,7 @@ function GreetingModal({ worker, onClose, onSaved }) {
 
   return (
     <Modal title={`Edit Greeting — ${worker.name}`} onClose={onClose}>
-      <p className="text-xs text-[#a8b4b4] mb-3">Sent automatically when a customer connects to this agent.</p>
+      <p className="text-xs text-white mb-3">Sent automatically when a customer connects to this agent.</p>
       <textarea className="gh-input resize-none text-sm" rows={4}
         value={greeting} onChange={e => setGreeting(e.target.value)} />
       <div className="flex gap-2 mt-4">
@@ -145,50 +145,50 @@ function NotifyModal({ workers, onClose }) {
       {/* Worker checkboxes */}
       <div className="mb-3">
         <div className="flex items-center justify-between mb-2">
-          <label className="text-sm font-medium text-[#ffffff]">Recipients</label>
+          <label className="text-sm font-medium text-white">Recipients</label>
           <div className="flex gap-2 text-xs">
-            <button onClick={selectAll} className="text-[#4d9fe0] hover:underline">All</button>
-            <span className="text-[#6b7878]">·</span>
-            <button onClick={deselectAll} className="text-[#4d9fe0] hover:underline">None</button>
+            <button onClick={selectAll} className="text-white hover:underline">All</button>
+            <span className="text-white">·</span>
+            <button onClick={deselectAll} className="text-white hover:underline">None</button>
           </div>
         </div>
-        <div className="bg-[#1c2020] border border-[#3a4040] rounded-md divide-y divide-[#323838] max-h-40 overflow-y-auto">
+        <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded divide-y divide-[#21262d] max-h-40 overflow-y-auto">
           {activeWorkers.length === 0 && (
-            <p className="text-xs text-[#6b7878] p-3">No active workers</p>
+            <p className="text-xs text-white p-3">No active workers</p>
           )}
           {activeWorkers.map(w => (
             <label key={w.id}
-              className="flex items-center gap-2.5 px-3 py-2 cursor-pointer hover:bg-[#323838] transition-colors">
+              className="flex items-center gap-2.5 px-3 py-2 cursor-pointer hover:bg-[#0a0a0a] transition-colors">
               <input type="checkbox" checked={selected.has(w.id)} onChange={() => toggleWorker(w.id)}
-                className="accent-[#1474d4] w-3.5 h-3.5" />
-              <div className="w-5 h-5 rounded-full bg-[#1474d4]/20 flex items-center justify-center text-[9px] font-bold text-[#4d9fe0] shrink-0">
+                className="accent-[#1f6feb] w-3.5 h-3.5" />
+              <div className="w-5 h-5 rounded bg-white/20 flex items-center justify-center text-[9px] font-bold text-white shrink-0">
                 {w.name?.[0]?.toUpperCase()}
               </div>
-              <span className="text-sm text-[#ffffff] flex-1 truncate">{w.name}</span>
+              <span className="text-sm text-white flex-1 truncate">{w.name}</span>
               {w.telegramVerified && (
-                <span className="text-[10px] text-[#2dcc5e] shrink-0">TG</span>
+                <span className="text-[10px] text-white shrink-0">TG</span>
               )}
             </label>
           ))}
         </div>
-        <p className="text-xs text-[#6b7878] mt-1">{selected.size} of {activeWorkers.length} selected</p>
+        <p className="text-xs text-white mt-1">{selected.size} of {activeWorkers.length} selected</p>
       </div>
 
       {/* Message */}
       <div className="mb-3">
-        <label className="block text-sm font-medium text-[#ffffff] mb-1.5">Message</label>
+        <label className="block text-sm font-medium text-white mb-1.5">Message</label>
         <textarea className="gh-input resize-none text-sm" rows={4}
           placeholder="Write your notification message here…"
           value={message} onChange={e => setMessage(e.target.value)} autoFocus />
-        <p className="text-xs text-[#6b7878] mt-1">{message.length} characters</p>
+        <p className="text-xs text-white mt-1">{message.length} characters</p>
       </div>
 
       {/* Telegram toggle */}
       <label className="flex items-center gap-2.5 mb-4 cursor-pointer select-none group">
         <input type="checkbox" checked={sendTg} onChange={e => setSendTg(e.target.checked)}
-          className="accent-[#1474d4] w-3.5 h-3.5" />
-        <span className="text-sm text-[#d0d8d8]">Also send via Telegram</span>
-        <span className="text-xs text-[#6b7878]">(for linked accounts)</span>
+          className="accent-[#1f6feb] w-3.5 h-3.5" />
+        <span className="text-sm text-white">Also send via Telegram</span>
+        <span className="text-xs text-white">(for linked accounts)</span>
       </label>
 
       <div className="flex gap-2">
@@ -253,11 +253,11 @@ export default function Workers() {
       {/* Page header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="text-base font-semibold text-[#ffffff] flex items-center gap-2">
-            <Users className="w-4 h-4 text-[#4d9fe0]" />
+          <h2 className="text-base font-semibold text-white flex items-center gap-2">
+            <Users className="w-4 h-4 text-white" />
             Workers
           </h2>
-          <p className="text-xs text-[#a8b4b4] mt-0.5">{workers.length} total · {workers.filter(w=>w.active).length} active</p>
+          <p className="text-xs text-white mt-0.5">{workers.length} total · {workers.filter(w=>w.active).length} active</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => setShowNotify(true)} disabled={workers.length === 0}
@@ -273,12 +273,12 @@ export default function Workers() {
       {/* Table */}
       <div className="gh-box overflow-hidden">
         {loading ? (
-          <div className="flex justify-center py-16"><Loader2 className="w-5 h-5 animate-spin text-[#4d9fe0]" /></div>
+          <div className="flex justify-center py-16"><Loader2 className="w-5 h-5 animate-spin text-white" /></div>
         ) : workers.length === 0 ? (
           <div className="flex flex-col items-center py-16 text-center">
-            <Shield className="w-8 h-8 text-[#3a4040] mb-3" />
-            <p className="text-sm text-[#a8b4b4] font-medium">No workers yet</p>
-            <p className="text-xs text-[#6b7878] mt-1">Add your first support agent to get started</p>
+            <Shield className="w-8 h-8 text-[#30363d] mb-3" />
+            <p className="text-sm text-white font-medium">No workers yet</p>
+            <p className="text-xs text-white mt-1">Add your first support agent to get started</p>
             <button onClick={() => setShowAdd(true)} className="gh-btn-blue mt-4 flex items-center gap-1.5">
               <UserPlus className="w-3.5 h-3.5" /> Add First Worker
             </button>
@@ -286,23 +286,23 @@ export default function Workers() {
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#323838]">
+              <tr className="border-b border-[#1a1a1a]">
                 {['Worker', 'Status', 'Email', 'Telegram', 'Greeting', 'Active', ''].map(h => (
-                  <th key={h} className="text-left text-[11px] font-medium text-[#6b7878] px-4 py-2.5 first:pl-5 last:pr-5">{h}</th>
+                  <th key={h} className="text-left text-[11px] font-medium text-white px-4 py-2.5 first:pl-5 last:pr-5">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {workers.map(w => (
-                <tr key={w.id} className="border-b border-[#323838] last:border-0 hover:bg-[#1c2128] transition-colors">
+                <tr key={w.id} className="border-b border-[#1a1a1a] last:border-0 hover:bg-[#0a0a0a] transition-colors">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-full bg-[#1474d4]/15 border border-[#1474d4]/25 flex items-center justify-center text-xs font-semibold text-[#4d9fe0] shrink-0">
+                      <div className="w-7 h-7 rounded bg-white/15 border border-[#1a1a1a]/25 flex items-center justify-center text-xs font-semibold text-white shrink-0">
                         {w.name?.[0]?.toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-[#ffffff] font-medium text-sm leading-tight">{w.name}</p>
-                        <p className="text-xs text-[#6b7878]">{w.email}</p>
+                        <p className="text-white font-medium text-sm leading-tight">{w.name}</p>
+                        <p className="text-xs text-white">{w.email}</p>
                       </div>
                     </div>
                   </td>
@@ -311,30 +311,30 @@ export default function Workers() {
                   </td>
                   <td className="px-4 py-3">
                     {w.emailVerified
-                      ? <CheckCircle className="w-4 h-4 text-[#2dcc5e]" />
-                      : <span className="text-xs text-[#d4a017]">Pending</span>}
+                      ? <CheckCircle className="w-4 h-4 text-white" />
+                      : <span className="text-xs text-white">Pending</span>}
                   </td>
                   <td className="px-4 py-3">
                     {w.telegramVerified
-                      ? <span className="text-xs text-[#2dcc5e] font-medium">Linked</span>
-                      : <span className="text-xs text-[#6b7878]">—</span>}
+                      ? <span className="text-xs text-white font-medium">Linked</span>
+                      : <span className="text-xs text-white">—</span>}
                   </td>
                   <td className="px-4 py-3">
                     <button onClick={() => setEditGreeting(w)}
-                      className="flex items-center gap-1 text-xs text-[#6b7878] hover:text-[#4d9fe0] transition-colors">
+                      className="flex items-center gap-1 text-xs text-white hover:text-white transition-colors">
                       <Edit3 className="w-3 h-3" /> {w.greeting ? 'Edit' : 'Set'}
                     </button>
                   </td>
                   <td className="px-4 py-3">
                     <button onClick={() => toggleActive(w)} className="transition-colors">
                       {w.active
-                        ? <ToggleRight className="w-6 h-6 text-[#2dcc5e]" />
-                        : <ToggleLeft className="w-6 h-6 text-[#3a4040]" />}
+                        ? <ToggleRight className="w-6 h-6 text-white" />
+                        : <ToggleLeft className="w-6 h-6 text-[#30363d]" />}
                     </button>
                   </td>
                   <td className="px-4 py-3 pr-5">
                     <button onClick={() => remove(w)}
-                      className="p-1.5 rounded-md text-[#6b7878] hover:text-[#f06060] hover:bg-[#e05050]/10 transition-all">
+                      className="p-1.5 rounded text-white hover:text-white hover:bg-white/10 transition-all">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </td>

@@ -27,19 +27,19 @@ const STEPS = [
 ];
 
 function Label({ children }) {
-  return <label className="block text-sm font-medium text-[#ffffff] mb-1.5">{children}</label>;
+  return <label className="block text-sm font-medium text-white mb-1.5">{children}</label>;
 }
 function Hint({ children }) {
-  return <p className="text-xs text-[#6b7878] mt-1">{children}</p>;
+  return <p className="text-xs text-white mt-1">{children}</p>;
 }
 function InfoBox({ children, color = 'blue' }) {
   const c = {
-    blue:   'bg-[#1474d4]/10 border-[#1474d4]/30 text-[#4d9fe0]',
-    yellow: 'bg-[#d4a017]/10 border-[#d4a017]/30 text-[#f0ba1c]',
-    green:  'bg-[#22b14c]/10 border-[#22b14c]/30 text-[#2dcc5e]',
-    red:    'bg-[#e05050]/10 border-[#e05050]/30 text-[#f06060]',
+    blue:   'bg-white/10 border-[#1a1a1a]/30 text-white',
+    yellow: 'bg-[#d29922]/10 border-[#d29922]/30 text-white',
+    green:  'bg-white/10 border-[#1a1a1a]/30 text-white',
+    red:    'bg-white/10 border-[#1a1a1a]/30 text-white',
   }[color];
-  return <div className={`p-3 rounded-md border text-xs ${c}`}>{children}</div>;
+  return <div className={`p-3 rounded border text-xs ${c}`}>{children}</div>;
 }
 
 export default function SetupWizard({ onComplete }) {
@@ -56,7 +56,7 @@ export default function SetupWizard({ onComplete }) {
   const [form, setForm] = useState({
     // Company
     companyName: '', companyTagline: '', companyWebsite: '', companyEmail: '',
-    companyLogoBase64: '', companyPrimaryColor: '#1474d4',
+    companyLogoBase64: '', companyPrimaryColor: '#1f6feb',
     // Firebase
     serviceAccountJson: '', webConfigRaw: '', storageBucket: '',
     // Telegram
@@ -155,19 +155,14 @@ export default function SetupWizard({ onComplete }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#252b2b] flex flex-col items-center justify-center p-4">
-      {/* Grid bg */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.025]"
-        style={{ backgroundImage: 'linear-gradient(#4d9fe0 1px, transparent 1px), linear-gradient(90deg, #4d9fe0 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
-
-      <div className="w-full max-w-lg animate-fade-in relative">
+    <div style={{minHeight:"100vh",background:"#0d1117",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"16px"}}><div className="w-full max-w-lg animate-fade-in relative">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex w-10 h-10 rounded-lg bg-[#2d3333] border border-[#3a4040] items-center justify-center mb-3">
-            <Bot className="w-5 h-5 text-[#4d9fe0]" />
+          <div className="inline-flex w-10 h-10 rounded bg-black border border-[#1a1a1a] items-center justify-center mb-3">
+            <Bot className="w-5 h-5 text-white" />
           </div>
-          <h1 className="text-xl font-semibold text-[#ffffff]">ChatNexus Setup</h1>
-          <p className="text-sm text-[#a8b4b4] mt-1">One-time configuration</p>
+          <h1 className="text-xl font-semibold text-white">ChatNexus Setup</h1>
+          <p className="text-sm text-white mt-1">One-time configuration</p>
         </div>
 
         {/* Step indicators */}
@@ -179,16 +174,16 @@ export default function SetupWizard({ onComplete }) {
             return (
               <div key={s.id} className="flex items-center gap-0.5">
                 <div className={clsx(
-                  'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all',
-                  done   ? 'bg-[#22b14c]/20 text-[#2dcc5e] border border-[#22b14c]/30' :
-                  active ? 'bg-[#1474d4]/15 text-[#4d9fe0] border border-[#1474d4]/30' :
-                           'text-[#6b7878] border border-transparent'
+                  'flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-all',
+                  done   ? 'bg-white/20 text-white border border-[#1a1a1a]/30' :
+                  active ? 'bg-white/15 text-white border border-[#1a1a1a]/30' :
+                           'text-white border border-transparent'
                 )}>
                   {done ? <CheckCircle className="w-3 h-3" /> : <Icon className="w-3 h-3" />}
                   <span className="hidden sm:inline">{s.label}</span>
                 </div>
                 {i < STEPS.length - 1 && (
-                  <div className={clsx('w-4 h-px mx-0.5', done ? 'bg-[#22b14c]/50' : 'bg-[#323838]')} />
+                  <div className={clsx('w-4 h-px mx-0.5', done ? 'bg-white/50' : 'bg-black')} />
                 )}
               </div>
             );
@@ -196,12 +191,12 @@ export default function SetupWizard({ onComplete }) {
         </div>
 
         {/* Card */}
-        <div className="bg-[#2d3333] border border-[#3a4040] rounded-md shadow-overlay">
+        <div className="bg-black border border-[#1a1a1a] rounded ">
           {/* Step header */}
-          <div className="flex items-center gap-2 px-5 py-3 border-b border-[#323838]">
-            {(() => { const Icon = STEPS[step-1].icon; return <Icon className="w-4 h-4 text-[#4d9fe0]" />; })()}
-            <h2 className="font-medium text-[#ffffff] text-sm">{STEPS[step-1].label}</h2>
-            <span className="ml-auto text-xs text-[#6b7878]">Step {step} of {STEPS.length}</span>
+          <div className="flex items-center gap-2 px-5 py-3 border-b border-[#1a1a1a]">
+            {(() => { const Icon = STEPS[step-1].icon; return <Icon className="w-4 h-4 text-white" />; })()}
+            <h2 className="font-medium text-white text-sm">{STEPS[step-1].label}</h2>
+            <span className="ml-auto text-xs text-white">Step {step} of {STEPS.length}</span>
           </div>
 
           <div className="p-5">
@@ -215,7 +210,7 @@ export default function SetupWizard({ onComplete }) {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="col-span-2">
-                    <Label>Company Name <span className="text-[#f06060]">*</span></Label>
+                    <Label>Company Name <span className="text-white">*</span></Label>
                     <input className="gh-input" placeholder="Acme Corp"
                       value={form.companyName} onChange={e => u('companyName', e.target.value)} />
                   </div>
@@ -240,26 +235,26 @@ export default function SetupWizard({ onComplete }) {
                 <div>
                   <Label>Logo</Label>
                   <label className={clsx(
-                    'flex items-center gap-3 border-2 border-dashed rounded-md p-4 cursor-pointer transition-all',
-                    logoPreview ? 'border-[#22b14c]/40 bg-[#22b14c]/5' : 'border-[#3a4040] hover:border-[#4d9fe0]/40 hover:bg-[#4d9fe0]/5'
+                    'flex items-center gap-3 border-2 border-dashed rounded p-4 cursor-pointer transition-all',
+                    logoPreview ? 'border-[#1a1a1a]/40 bg-white/5' : 'border-[#1a1a1a] hover:border-[#58a6ff]/40 hover:bg-[#58a6ff]/5'
                   )}>
                     <input type="file" accept="image/*" className="hidden" onChange={handleLogoFile} />
                     {logoPreview ? (
                       <div className="flex items-center gap-3">
                         <img src={logoPreview} alt="logo" className="h-10 w-auto rounded object-contain" />
                         <div>
-                          <p className="text-xs font-medium text-[#2dcc5e]">Logo loaded</p>
-                          <p className="text-xs text-[#6b7878]">Click to replace</p>
+                          <p className="text-xs font-medium text-white">Logo loaded</p>
+                          <p className="text-xs text-white">Click to replace</p>
                         </div>
                       </div>
                     ) : (
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-md bg-[#323838] flex items-center justify-center">
-                          <Image className="w-5 h-5 text-[#6b7878]" />
+                        <div className="w-10 h-10 rounded bg-black flex items-center justify-center">
+                          <Image className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <p className="text-xs font-medium text-[#ffffff]">Upload logo</p>
-                          <p className="text-xs text-[#6b7878]">PNG, SVG, JPG — max 500KB</p>
+                          <p className="text-xs font-medium text-white">Upload logo</p>
+                          <p className="text-xs text-white">PNG, SVG, JPG — max 500KB</p>
                         </div>
                       </div>
                     )}
@@ -272,8 +267,8 @@ export default function SetupWizard({ onComplete }) {
                   <div className="flex items-center gap-3">
                     <input type="color" value={form.companyPrimaryColor}
                       onChange={e => u('companyPrimaryColor', e.target.value)}
-                      className="w-10 h-8 rounded cursor-pointer border border-[#3a4040] bg-[#1c2020] p-0.5" />
-                    <input className="gh-input flex-1" placeholder="#1474d4"
+                      className="w-10 h-8 rounded cursor-pointer border border-[#1a1a1a] bg-black p-0.5" />
+                    <input className="gh-input flex-1" placeholder="#1f6feb"
                       value={form.companyPrimaryColor} onChange={e => u('companyPrimaryColor', e.target.value)} />
                   </div>
                   <Hint>Used in PDF reports and email templates</Hint>
@@ -293,20 +288,20 @@ export default function SetupWizard({ onComplete }) {
               <div className="space-y-4">
                 <InfoBox color="blue">
                   <p className="font-medium mb-1">Two things needed from Firebase Console:</p>
-                  <p>① <span className="text-[#ffffff]">Service Account Key</span> → Project Settings → Service Accounts → Generate new key</p>
-                  <p className="mt-0.5">② <span className="text-[#ffffff]">Web SDK Config</span> → Project Settings → Your apps → SDK setup</p>
+                  <p>① <span className="text-white">Service Account Key</span> → Project Settings → Service Accounts → Generate new key</p>
+                  <p className="mt-0.5">② <span className="text-white">Web SDK Config</span> → Project Settings → Your apps → SDK setup</p>
                 </InfoBox>
 
                 <div>
                   <Label>① Service Account JSON</Label>
                   <label className={clsx(
-                    'flex items-center gap-3 border-2 border-dashed rounded-md p-4 cursor-pointer transition-all',
-                    form.serviceAccountJson ? 'border-[#22b14c]/40 bg-[#22b14c]/5' : 'border-[#3a4040] hover:border-[#4d9fe0]/40'
+                    'flex items-center gap-3 border-2 border-dashed rounded p-4 cursor-pointer transition-all',
+                    form.serviceAccountJson ? 'border-[#1a1a1a]/40 bg-white/5' : 'border-[#1a1a1a] hover:border-[#58a6ff]/40'
                   )}>
                     <input type="file" accept=".json" className="hidden" onChange={handleServiceAccountFile} />
                     {form.serviceAccountJson
-                      ? <span className="text-[#2dcc5e] text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" /> Service account loaded</span>
-                      : <span className="text-[#6b7878] text-sm flex items-center gap-2"><Upload className="w-4 h-4" /> Upload .json key file</span>}
+                      ? <span className="text-white text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" /> Service account loaded</span>
+                      : <span className="text-white text-sm flex items-center gap-2"><Upload className="w-4 h-4" /> Upload .json key file</span>}
                   </label>
                 </div>
 
@@ -328,7 +323,7 @@ export default function SetupWizard({ onComplete }) {
                   <InfoBox color="red">
                     <p>{firestoreErr.error}</p>
                     <a href={firestoreErr.firestoreUrl} target="_blank" rel="noreferrer"
-                      className="text-[#4d9fe0] hover:underline mt-1 inline-block">→ Enable Firestore API</a>
+                      className="text-white hover:underline mt-1 inline-block">→ Enable Firestore API</a>
                   </InfoBox>
                 )}
                 {fbValid && <InfoBox color="green">Connected to <strong>{fbProjectId}</strong></InfoBox>}
@@ -450,7 +445,7 @@ export default function SetupWizard({ onComplete }) {
                     <input className="gh-input pr-10" type={showPass ? 'text' : 'password'} placeholder="Min 8 characters"
                       value={form.adminPassword} onChange={e => u('adminPassword', e.target.value)} />
                     <button type="button" onClick={() => setShowPass(p => !p)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7878] hover:text-[#ffffff] transition-colors">
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white hover:text-white transition-colors">
                       {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
@@ -473,22 +468,22 @@ export default function SetupWizard({ onComplete }) {
               <div className="space-y-3">
                 {/* Company preview */}
                 {(form.companyLogoBase64 || form.companyName) && (
-                  <div className="flex items-center gap-3 p-3 bg-[#323838] rounded-md border border-[#3a4040] mb-4">
+                  <div className="flex items-center gap-3 p-3 bg-black rounded border border-[#1a1a1a] mb-4">
                     {form.companyLogoBase64 && (
                       <img src={form.companyLogoBase64} alt="" className="h-8 w-auto object-contain" />
                     )}
                     <div>
-                      <p className="text-sm font-semibold text-[#ffffff]">{form.companyName}</p>
-                      {form.companyTagline && <p className="text-xs text-[#a8b4b4]">{form.companyTagline}</p>}
+                      <p className="text-sm font-semibold text-white">{form.companyName}</p>
+                      {form.companyTagline && <p className="text-xs text-white">{form.companyTagline}</p>}
                     </div>
                     {form.companyPrimaryColor && (
-                      <div className="ml-auto w-5 h-5 rounded-full border border-[#3a4040]"
+                      <div className="ml-auto w-5 h-5 rounded border border-[#1a1a1a]"
                         style={{ background: form.companyPrimaryColor }} />
                     )}
                   </div>
                 )}
 
-                <div className="divide-y divide-[#323838]">
+                <div className="divide-y divide-[#21262d]">
                   {[
                     ['Firebase Project', fbProjectId],
                     ['Storage Bucket', form.storageBucket],
@@ -500,8 +495,8 @@ export default function SetupWizard({ onComplete }) {
                     ['Website', form.companyWebsite || '—'],
                   ].map(([label, val]) => (
                     <div key={label} className="flex justify-between items-center py-2.5 text-sm">
-                      <span className="text-[#a8b4b4]">{label}</span>
-                      <span className="text-[#ffffff] font-mono text-xs bg-[#323838] px-2 py-0.5 rounded">{val}</span>
+                      <span className="text-white">{label}</span>
+                      <span className="text-white font-mono text-xs bg-black px-2 py-0.5 rounded">{val}</span>
                     </div>
                   ))}
                 </div>

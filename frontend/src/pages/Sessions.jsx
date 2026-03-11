@@ -46,8 +46,8 @@ export default function Sessions() {
         <div className="flex gap-2">
           {['all', 'active', 'closed'].map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={clsx('px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize',
-                filter === f ? 'bg-[#1474d4] text-[#ffffff]' : 'bg-surface-700 text-slate-400 hover:text-[#ffffff] border border-[#3a4040]')}>
+              className={clsx('px-4 py-2 rounded text-sm font-medium transition-all capitalize',
+                filter === f ? 'bg-white text-white' : 'bg-surface-700 text-slate-400 hover:text-white border border-[#1a1a1a]')}>
               {f}
             </button>
           ))}
@@ -58,7 +58,7 @@ export default function Sessions() {
       <div className="card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#3a4040]">
+            <tr className="border-b border-[#1a1a1a]">
               {['Session', 'Customer', user.role === 'admin' && 'Worker', 'Language', 'Status', 'Created'].filter(Boolean).map(h => (
                 <th key={h} className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-5 py-3.5">{h}</th>
               ))}
@@ -77,17 +77,17 @@ export default function Sessions() {
                 </td>
               </tr>
             ) : filtered.map(s => (
-              <tr key={s.id} className="border-b border-[#3a4040] last:border-0 hover:bg-white/2 transition-colors">
+              <tr key={s.id} className="border-b border-[#1a1a1a] last:border-0 hover:bg-white/2 transition-colors">
                 <td className="px-5 py-3.5">
                   <span className="font-mono text-xs text-slate-400">#{s.id.slice(-8)}</span>
                 </td>
                 <td className="px-5 py-3.5">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-surface-700 flex items-center justify-center">
+                    <div className="w-7 h-7 rounded bg-surface-700 flex items-center justify-center">
                       <User className="w-3.5 h-3.5 text-slate-400" />
                     </div>
                     <div>
-                      <p className="text-[#ffffff] text-xs font-medium">{s.customerFirstName || 'Customer'}</p>
+                      <p className="text-white text-xs font-medium">{s.customerFirstName || 'Customer'}</p>
                       <p className="text-slate-500 text-xs">ID: {s.customerTelegramId}</p>
                     </div>
                   </div>
@@ -96,13 +96,13 @@ export default function Sessions() {
                   <td className="px-5 py-3.5 text-xs text-slate-300">{s.workerName || '—'}</td>
                 )}
                 <td className="px-5 py-3.5">
-                  <span className="text-xs bg-surface-700 border border-[#3a4040] px-2 py-0.5 rounded-full text-slate-300 uppercase">{s.language || 'en'}</span>
+                  <span className="text-xs bg-surface-700 border border-[#1a1a1a] px-2 py-0.5 rounded text-slate-300 uppercase">{s.language || 'en'}</span>
                 </td>
                 <td className="px-5 py-3.5">
-                  <span className={clsx('text-xs px-2.5 py-1 rounded-full border',
+                  <span className={clsx('text-xs px-2.5 py-1 rounded border',
                     s.status === 'active' ? 'status-free' : 'status-offline')}>
                     {s.status === 'active' ? (
-                      <span className="flex items-center gap-1"><span className="w-1 h-1 rounded-full bg-accent-500 animate-pulse-dot inline-block" /> Active</span>
+                      <span className="flex items-center gap-1"><span className="w-1 h-1 rounded bg-accent-500 animate-pulse-dot inline-block" /> Active</span>
                     ) : 'Closed'}
                   </span>
                 </td>
