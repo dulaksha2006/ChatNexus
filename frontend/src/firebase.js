@@ -1,9 +1,9 @@
-import { initializeApp, getApps } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
 
-let db, storage, _app;
+let db, storage;
 
 export async function initFirebase() {
   if (getApps().length > 0) return;
@@ -13,11 +13,16 @@ export async function initFirebase() {
   const config = await res.json();
   if (!config.apiKey) return;
 
-  _app    = initializeApp(config);
-  db      = getFirestore(_app);
-  storage = getStorage(_app);
-  // Initialize auth (needed for custom token sign-in)
-  getAuth(_app);
+  const app = initializeApp(config);
+  db      = getFirestore(app);
+  storage = getStorage(app);
+  // Auth must be initialized on same app instance
+  getAuth(app);
+}
+
+// Returns the Auth instance — safe to call after initFirebase()
+export function getFirebaseAuth() {
+  try { return getAuth(getApp()); } catch { return null; }
 }
 
 export function getDb()       { return db; }

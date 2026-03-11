@@ -77,7 +77,7 @@ router.post('/complete', async (req, res) => {
     const existing = await getSystemConfig();
     if (existing?.setupComplete) return res.status(409).json({ error: 'Already configured' });
 
-    const { botToken, channelId, adminEmail, adminPassword, adminName, smtp, firebaseWebConfig } = req.body;
+    const { botToken, channelId, adminEmail, adminPassword, adminName, smtp, firebaseWebConfig, company } = req.body;
     if (!botToken || !channelId || !adminEmail || !adminPassword || !adminName)
       return res.status(400).json({ error: 'Missing required fields' });
 
@@ -94,6 +94,7 @@ router.post('/complete', async (req, res) => {
       createdAt: admin.firestore.FieldValue.serverTimestamp() };
     if (smtp?.host)                systemConfig.smtp = smtp;
     if (firebaseWebConfig?.apiKey) systemConfig.firebaseWebConfig = firebaseWebConfig;
+    if (company?.name)             systemConfig.company = company;
     await setSystemConfig(systemConfig);
 
     // Seed English language + bot texts only

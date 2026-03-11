@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CheckCircle, ArrowRight, ArrowLeft, Bot, Database, Mail, User,
-         Loader2, ShieldCheck, Upload, Eye, EyeOff } from 'lucide-react';
+         Loader2, ShieldCheck, Upload, Eye, EyeOff, Building2, Image } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../api';
 import clsx from 'clsx';
@@ -8,11 +8,8 @@ import clsx from 'clsx';
 function parseFirebaseConfig(raw) {
   if (!raw?.trim()) return null;
   let s = raw.trim()
-    .replace(/\/\/[^\n]*/g, '')
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/^[^{]*/, '')
-    .replace(/;?\s*$/, '')
-    .trim();
+    .replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^[^{]*/, '').replace(/;?\s*$/, '').trim();
   if (!s.startsWith('{')) return null;
   try { return JSON.parse(s); } catch {}
   try { return JSON.parse(s.replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)(\s*:)/g, '$1"$2"$3')); } catch {}
@@ -21,32 +18,57 @@ function parseFirebaseConfig(raw) {
 }
 
 const STEPS = [
-  { id: 1, label: 'Firebase' },
-  { id: 2, label: 'Telegram' },
-  { id: 3, label: 'Email (SMTP)' },
-  { id: 4, label: 'Admin' },
-  { id: 5, label: 'Confirm' },
+  { id: 1, label: 'Company',  icon: Building2 },
+  { id: 2, label: 'Firebase', icon: Database },
+  { id: 3, label: 'Telegram', icon: Bot },
+  { id: 4, label: 'Email',    icon: Mail },
+  { id: 5, label: 'Admin',    icon: User },
+  { id: 6, label: 'Review',   icon: ShieldCheck },
 ];
 
+function Label({ children }) {
+  return <label className="block text-sm font-medium text-[#e6edf3] mb-1.5">{children}</label>;
+}
+function Hint({ children }) {
+  return <p className="text-xs text-[#6e7681] mt-1">{children}</p>;
+}
+function InfoBox({ children, color = 'blue' }) {
+  const c = {
+    blue:   'bg-[#1f6feb]/10 border-[#1f6feb]/30 text-[#58a6ff]',
+    yellow: 'bg-[#d29922]/10 border-[#d29922]/30 text-[#e3b341]',
+    green:  'bg-[#238636]/10 border-[#238636]/30 text-[#3fb950]',
+    red:    'bg-[#da3633]/10 border-[#da3633]/30 text-[#f85149]',
+  }[color];
+  return <div className={`p-3 rounded-md border text-xs ${c}`}>{children}</div>;
+}
+
 export default function SetupWizard({ onComplete }) {
-  const [step, setStep]               = useState(1);
-  const [loading, setLoading]         = useState(false);
-  const [fbValid, setFbValid]         = useState(false);
+  const [step, setStep]           = useState(1);
+  const [loading, setLoading]     = useState(false);
+  const [fbValid, setFbValid]     = useState(false);
   const [fbProjectId, setFbProjectId] = useState('');
-  const [botValid, setBotValid]       = useState(false);
-  const [botInfo, setBotInfo]         = useState(null);
+  const [botValid, setBotValid]   = useState(false);
+  const [botInfo, setBotInfo]     = useState(null);
   const [firestoreErr, setFirestoreErr] = useState(null);
-  const [showPass, setShowPass]       = useState(false);
+  const [showPass, setShowPass]   = useState(false);
+  const [logoPreview, setLogoPreview] = useState(null);
 
   const [form, setForm] = useState({
+    // Company
+    companyName: '', companyTagline: '', companyWebsite: '', companyEmail: '',
+    companyLogoBase64: '', companyPrimaryColor: '#1f6feb',
+    // Firebase
     serviceAccountJson: '', webConfigRaw: '', storageBucket: '',
+    // Telegram
     botToken: '', channelId: '',
+    // SMTP
     smtpHost: '', smtpPort: '587', smtpUser: '', smtpPass: '', smtpFrom: '',
+    // Admin
     adminName: '', adminEmail: '', adminPassword: '',
   });
   const u = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
-  function handleFile(e) {
+  function handleServiceAccountFile(e) {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
@@ -63,10 +85,24 @@ export default function SetupWizard({ onComplete }) {
     reader.readAsText(file);
   }
 
+  function handleLogoFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 500 * 1024) { toast.error('Logo must be under 500KB'); return; }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const base64 = ev.target.result;
+      setLogoPreview(base64);
+      u('companyLogoBase64', base64);
+      toast.success('Logo loaded ✓');
+    };
+    reader.readAsDataURL(file);
+  }
+
   async function validateFirebase() {
     if (!form.serviceAccountJson) return toast.error('Upload service account JSON file');
     const wc = parseFirebaseConfig(form.webConfigRaw);
-    if (!wc?.apiKey) return toast.error('Could not parse Web SDK config — paste the firebaseConfig block');
+    if (!wc?.apiKey) return toast.error('Could not parse Web SDK config');
     setFirestoreErr(null);
     setLoading(true);
     try {
@@ -102,6 +138,11 @@ export default function SetupWizard({ onComplete }) {
         botToken: form.botToken, channelId: form.channelId,
         adminName: form.adminName, adminEmail: form.adminEmail, adminPassword: form.adminPassword,
         firebaseWebConfig: parseFirebaseConfig(form.webConfigRaw),
+        company: {
+          name: form.companyName, tagline: form.companyTagline,
+          website: form.companyWebsite, email: form.companyEmail,
+          logoBase64: form.companyLogoBase64, primaryColor: form.companyPrimaryColor,
+        },
       };
       if (form.smtpHost) {
         payload.smtp = { host: form.smtpHost, port: Number(form.smtpPort), user: form.smtpUser, pass: form.smtpPass, from: form.smtpFrom, secure: false };
@@ -114,255 +155,371 @@ export default function SetupWizard({ onComplete }) {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="w-full max-w-xl">
+    <div className="min-h-screen bg-[#0d1117] flex flex-col items-center justify-center p-4">
+      {/* Grid bg */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.025]"
+        style={{ backgroundImage: 'linear-gradient(#58a6ff 1px, transparent 1px), linear-gradient(90deg, #58a6ff 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+
+      <div className="w-full max-w-lg animate-fade-in relative">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/20 items-center justify-center mb-4">
-            <Bot className="w-6 h-6 text-brand-400" />
+        <div className="text-center mb-6">
+          <div className="inline-flex w-10 h-10 rounded-lg bg-[#161b22] border border-[#30363d] items-center justify-center mb-3">
+            <Bot className="w-5 h-5 text-[#58a6ff]" />
           </div>
-          <h1 className="text-2xl font-bold text-white">System Setup</h1>
-          <p className="text-zinc-500 text-sm mt-1">One-time configuration</p>
+          <h1 className="text-xl font-semibold text-[#e6edf3]">ChatNexus Setup</h1>
+          <p className="text-sm text-[#8b949e] mt-1">One-time configuration</p>
         </div>
 
-        {/* Steps */}
-        <div className="flex items-center justify-center gap-1 mb-8">
-          {STEPS.map((s, i) => (
-            <div key={s.id} className="flex items-center gap-1">
-              <div className={clsx(
-                'flex items-center justify-center w-7 h-7 rounded-full text-xs font-semibold transition-all',
-                step > s.id  ? 'bg-emerald-500 text-white' :
-                step === s.id ? 'bg-brand-500 text-white ring-2 ring-brand-500/30' :
-                               'bg-zinc-900 text-zinc-600 border border-white/5'
-              )}>
-                {step > s.id ? '✓' : s.id}
-              </div>
-              {i < STEPS.length - 1 && <div className={clsx('w-6 h-px', step > s.id ? 'bg-emerald-500' : 'bg-zinc-800')} />}
-            </div>
-          ))}
-        </div>
-
-        <div className="bg-zinc-950 border border-white/10 rounded-2xl p-6">
-          <div className="flex items-center gap-2 mb-5 pb-4 border-b border-white/5">
-            <div className="w-1 h-4 rounded-full bg-brand-500" />
-            <h2 className="font-semibold text-white text-sm">{STEPS[step-1].label}</h2>
-          </div>
-
-          {/* ── Step 1: Firebase ─────────────── */}
-          {step === 1 && (
-            <div className="space-y-4">
-              <div className="p-3 bg-zinc-900 rounded-xl border border-white/5 text-xs text-zinc-400 space-y-1">
-                <p className="text-white font-medium mb-1">Two things needed from Firebase Console:</p>
-                <p>① <span className="text-brand-400">Service Account Key</span> → Project Settings → Service Accounts → Generate new key</p>
-                <p>② <span className="text-brand-400">Web SDK Config</span> → Project Settings → Your apps → SDK setup → Config</p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">① Service Account Key</label>
-                <label className={clsx(
-                  'flex items-center justify-center gap-2 w-full border-2 border-dashed rounded-xl p-4 cursor-pointer transition-all',
-                  form.serviceAccountJson ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-white/10 hover:border-brand-500/30 hover:bg-brand-500/5'
+        {/* Step indicators */}
+        <div className="flex items-center justify-center gap-0.5 mb-6 flex-wrap gap-y-2">
+          {STEPS.map((s, i) => {
+            const Icon = s.icon;
+            const done = step > s.id;
+            const active = step === s.id;
+            return (
+              <div key={s.id} className="flex items-center gap-0.5">
+                <div className={clsx(
+                  'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all',
+                  done   ? 'bg-[#238636]/20 text-[#3fb950] border border-[#238636]/30' :
+                  active ? 'bg-[#1f6feb]/15 text-[#58a6ff] border border-[#1f6feb]/30' :
+                           'text-[#6e7681] border border-transparent'
                 )}>
-                  <input type="file" accept=".json" className="hidden" onChange={handleFile} />
-                  {form.serviceAccountJson
-                    ? <span className="text-emerald-400 text-sm font-medium flex items-center gap-2"><CheckCircle className="w-4 h-4" /> Service account loaded</span>
-                    : <span className="text-zinc-500 text-sm flex items-center gap-2"><Upload className="w-4 h-4" /> Upload .json file</span>}
-                </label>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Storage Bucket</label>
-                <input className="input-field text-sm font-mono" placeholder="project-id.firebasestorage.app"
-                  value={form.storageBucket} onChange={e => u('storageBucket', e.target.value)} />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">② Web SDK Config</label>
-                <textarea className="input-field text-xs font-mono resize-none" rows={6}
-                  placeholder={`const firebaseConfig = {\n  apiKey: "...",\n  projectId: "..."\n};`}
-                  value={form.webConfigRaw} onChange={e => u('webConfigRaw', e.target.value)} />
-                <p className="text-[10px] text-zinc-600 mt-1">Paste exactly as-is — JS or JSON both work</p>
-              </div>
-
-              {firestoreErr && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl space-y-2">
-                  <p className="text-xs text-red-400">{firestoreErr.error}</p>
-                  <a href={firestoreErr.firestoreUrl} target="_blank" rel="noreferrer"
-                    className="text-xs text-brand-400 hover:text-brand-300 underline">
-                    → Enable Firestore API for this project
-                  </a>
-                  <p className="text-[10px] text-zinc-600">Wait 1–2 min after enabling, then retry.</p>
+                  {done ? <CheckCircle className="w-3 h-3" /> : <Icon className="w-3 h-3" />}
+                  <span className="hidden sm:inline">{s.label}</span>
                 </div>
-              )}
-              {fbValid && (
-                <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-sm text-emerald-400">
-                  <CheckCircle className="w-4 h-4 shrink-0" /> Connected to <strong>{fbProjectId}</strong>
-                </div>
-              )}
+                {i < STEPS.length - 1 && (
+                  <div className={clsx('w-4 h-px mx-0.5', done ? 'bg-[#238636]/50' : 'bg-[#21262d]')} />
+                )}
+              </div>
+            );
+          })}
+        </div>
 
-              <div className="flex justify-end gap-2 pt-1">
-                <button onClick={validateFirebase} disabled={loading || !form.serviceAccountJson || !form.webConfigRaw}
-                  className="px-4 py-2 rounded-lg border border-white/10 text-sm text-zinc-300 hover:text-white hover:bg-white/5 transition-all disabled:opacity-40 flex items-center gap-2">
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Database className="w-4 h-4" />} Test
-                </button>
-                <button onClick={() => setStep(2)} disabled={!fbValid} className="btn-primary text-sm flex items-center gap-2">
-                  Next <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
+        {/* Card */}
+        <div className="bg-[#161b22] border border-[#30363d] rounded-md shadow-overlay">
+          {/* Step header */}
+          <div className="flex items-center gap-2 px-5 py-3 border-b border-[#21262d]">
+            {(() => { const Icon = STEPS[step-1].icon; return <Icon className="w-4 h-4 text-[#58a6ff]" />; })()}
+            <h2 className="font-medium text-[#e6edf3] text-sm">{STEPS[step-1].label}</h2>
+            <span className="ml-auto text-xs text-[#6e7681]">Step {step} of {STEPS.length}</span>
+          </div>
 
-          {/* ── Step 2: Telegram ─────────────── */}
-          {step === 2 && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Bot Token</label>
-                <input className="input-field font-mono text-xs" placeholder="110201543:AAHdqTcvCH1..."
-                  value={form.botToken} onChange={e => { u('botToken', e.target.value); setBotValid(false); }} />
-                <p className="text-[10px] text-zinc-600 mt-1">Get from @BotFather on Telegram</p>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Channel ID</label>
-                <input className="input-field" placeholder="-1001234567890"
-                  value={form.channelId} onChange={e => { u('channelId', e.target.value); setBotValid(false); }} />
-                <p className="text-[10px] text-zinc-600 mt-1">Bot must be admin in this channel</p>
-              </div>
-              {botValid && (
-                <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-sm text-emerald-400">
-                  <CheckCircle className="w-4 h-4 shrink-0" /> @{botInfo?.botUsername} verified ✓
-                </div>
-              )}
-              <div className="flex justify-between pt-1">
-                <button onClick={() => setStep(1)} className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors">
-                  <ArrowLeft className="w-4 h-4" /> Back
-                </button>
-                <div className="flex gap-2">
-                  <button onClick={validateBot} disabled={loading || !form.botToken || !form.channelId}
-                    className="px-4 py-2 rounded-lg border border-white/10 text-sm text-zinc-300 hover:text-white hover:bg-white/5 transition-all disabled:opacity-40 flex items-center gap-2">
-                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Test Bot'}
-                  </button>
-                  <button onClick={() => setStep(3)} disabled={!botValid} className="btn-primary text-sm flex items-center gap-2">
-                    Next <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          <div className="p-5">
 
-          {/* ── Step 3: SMTP ─────────────────── */}
-          {step === 3 && (
-            <div className="space-y-4">
-              <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-400">
-                Optional. Skip if you don't need email verification or email password resets.
-                If SMTP is set, the admin account you create will also receive a verification email.
-              </div>
-              <div className="grid grid-cols-2 gap-3">
+            {/* ─── Step 1: Company ─── */}
+            {step === 1 && (
+              <div className="space-y-4">
+                <InfoBox color="blue">
+                  This info is used in PDF reports and notifications sent to workers.
+                </InfoBox>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="col-span-2">
+                    <Label>Company Name <span className="text-[#f85149]">*</span></Label>
+                    <input className="gh-input" placeholder="Acme Corp"
+                      value={form.companyName} onChange={e => u('companyName', e.target.value)} />
+                  </div>
+                  <div className="col-span-2">
+                    <Label>Tagline</Label>
+                    <input className="gh-input" placeholder="Support that never sleeps"
+                      value={form.companyTagline} onChange={e => u('companyTagline', e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>Website</Label>
+                    <input className="gh-input" placeholder="https://acme.com"
+                      value={form.companyWebsite} onChange={e => u('companyWebsite', e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>Support Email</Label>
+                    <input className="gh-input" placeholder="support@acme.com"
+                      value={form.companyEmail} onChange={e => u('companyEmail', e.target.value)} />
+                  </div>
+                </div>
+
+                {/* Logo upload */}
                 <div>
-                  <label className="block text-xs text-zinc-400 mb-1.5">Host</label>
-                  <input className="input-field text-sm" placeholder="smtp.gmail.com"
-                    value={form.smtpHost} onChange={e => u('smtpHost', e.target.value)} />
+                  <Label>Logo</Label>
+                  <label className={clsx(
+                    'flex items-center gap-3 border-2 border-dashed rounded-md p-4 cursor-pointer transition-all',
+                    logoPreview ? 'border-[#238636]/40 bg-[#238636]/5' : 'border-[#30363d] hover:border-[#58a6ff]/40 hover:bg-[#58a6ff]/5'
+                  )}>
+                    <input type="file" accept="image/*" className="hidden" onChange={handleLogoFile} />
+                    {logoPreview ? (
+                      <div className="flex items-center gap-3">
+                        <img src={logoPreview} alt="logo" className="h-10 w-auto rounded object-contain" />
+                        <div>
+                          <p className="text-xs font-medium text-[#3fb950]">Logo loaded</p>
+                          <p className="text-xs text-[#6e7681]">Click to replace</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-md bg-[#21262d] flex items-center justify-center">
+                          <Image className="w-5 h-5 text-[#6e7681]" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-medium text-[#e6edf3]">Upload logo</p>
+                          <p className="text-xs text-[#6e7681]">PNG, SVG, JPG — max 500KB</p>
+                        </div>
+                      </div>
+                    )}
+                  </label>
                 </div>
-                <div>
-                  <label className="block text-xs text-zinc-400 mb-1.5">Port</label>
-                  <input className="input-field text-sm" placeholder="587"
-                    value={form.smtpPort} onChange={e => u('smtpPort', e.target.value)} />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs text-zinc-400 mb-1.5">Username</label>
-                <input className="input-field text-sm" placeholder="you@gmail.com"
-                  value={form.smtpUser} onChange={e => u('smtpUser', e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-xs text-zinc-400 mb-1.5">App Password</label>
-                <input className="input-field text-sm" type="password"
-                  value={form.smtpPass} onChange={e => u('smtpPass', e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-xs text-zinc-400 mb-1.5">From Address</label>
-                <input className="input-field text-sm" placeholder="Support <noreply@company.com>"
-                  value={form.smtpFrom} onChange={e => u('smtpFrom', e.target.value)} />
-              </div>
-              <div className="flex justify-between pt-1">
-                <button onClick={() => setStep(2)} className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors">
-                  <ArrowLeft className="w-4 h-4" /> Back
-                </button>
-                <div className="flex gap-2">
-                  <button onClick={() => setStep(4)} className="px-4 py-2 rounded-lg border border-white/10 text-sm text-zinc-400 hover:text-white transition-all">Skip</button>
-                  <button onClick={() => setStep(4)} className="btn-primary text-sm flex items-center gap-2">Next <ArrowRight className="w-4 h-4" /></button>
-                </div>
-              </div>
-            </div>
-          )}
 
-          {/* ── Step 4: Admin ─────────────────── */}
-          {step === 4 && (
-            <div className="space-y-4">
-              {form.smtpHost && (
-                <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-xs text-blue-400">
-                  SMTP is configured — a verification email will be sent to the admin account.
+                {/* Brand color */}
+                <div>
+                  <Label>Brand Color</Label>
+                  <div className="flex items-center gap-3">
+                    <input type="color" value={form.companyPrimaryColor}
+                      onChange={e => u('companyPrimaryColor', e.target.value)}
+                      className="w-10 h-8 rounded cursor-pointer border border-[#30363d] bg-[#010409] p-0.5" />
+                    <input className="gh-input flex-1" placeholder="#1f6feb"
+                      value={form.companyPrimaryColor} onChange={e => u('companyPrimaryColor', e.target.value)} />
+                  </div>
+                  <Hint>Used in PDF reports and email templates</Hint>
                 </div>
-              )}
-              <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Full Name</label>
-                <input className="input-field" placeholder="John Doe"
-                  value={form.adminName} onChange={e => u('adminName', e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Email</label>
-                <input className="input-field" type="email" placeholder="admin@company.com"
-                  value={form.adminEmail} onChange={e => u('adminEmail', e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Password</label>
-                <div className="relative">
-                  <input className="input-field pr-10" type={showPass ? 'text' : 'password'} placeholder="Min 8 characters"
-                    value={form.adminPassword} onChange={e => u('adminPassword', e.target.value)} />
-                  <button type="button" onClick={() => setShowPass(p => !p)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors">
-                    {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+
+                <div className="flex justify-end pt-1">
+                  <button onClick={() => setStep(2)} disabled={!form.companyName.trim()}
+                    className="gh-btn-blue flex items-center gap-1.5">
+                    Next <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
-              <div className="flex justify-between pt-1">
-                <button onClick={() => setStep(3)} className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors">
-                  <ArrowLeft className="w-4 h-4" /> Back
-                </button>
-                <button onClick={() => setStep(5)}
-                  disabled={!form.adminName || !form.adminEmail || form.adminPassword.length < 8}
-                  className="btn-primary text-sm flex items-center gap-2">
-                  Next <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
+            )}
 
-          {/* ── Step 5: Confirm ───────────────── */}
-          {step === 5 && (
-            <div className="space-y-3">
-              {[
-                ['Firebase Project', fbProjectId],
-                ['Storage Bucket', form.storageBucket],
-                ['Bot', botInfo ? `@${botInfo.botUsername}` : '—'],
-                ['Channel', form.channelId],
-                ['SMTP', form.smtpHost || 'Not configured'],
-                ['Admin Email', form.adminEmail],
-              ].map(([label, val]) => (
-                <div key={label} className="flex justify-between py-2.5 border-b border-white/5 text-sm last:border-0">
-                  <span className="text-zinc-500">{label}</span>
-                  <span className="text-white font-mono text-xs">{val}</span>
+            {/* ─── Step 2: Firebase ─── */}
+            {step === 2 && (
+              <div className="space-y-4">
+                <InfoBox color="blue">
+                  <p className="font-medium mb-1">Two things needed from Firebase Console:</p>
+                  <p>① <span className="text-[#e6edf3]">Service Account Key</span> → Project Settings → Service Accounts → Generate new key</p>
+                  <p className="mt-0.5">② <span className="text-[#e6edf3]">Web SDK Config</span> → Project Settings → Your apps → SDK setup</p>
+                </InfoBox>
+
+                <div>
+                  <Label>① Service Account JSON</Label>
+                  <label className={clsx(
+                    'flex items-center gap-3 border-2 border-dashed rounded-md p-4 cursor-pointer transition-all',
+                    form.serviceAccountJson ? 'border-[#238636]/40 bg-[#238636]/5' : 'border-[#30363d] hover:border-[#58a6ff]/40'
+                  )}>
+                    <input type="file" accept=".json" className="hidden" onChange={handleServiceAccountFile} />
+                    {form.serviceAccountJson
+                      ? <span className="text-[#3fb950] text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" /> Service account loaded</span>
+                      : <span className="text-[#6e7681] text-sm flex items-center gap-2"><Upload className="w-4 h-4" /> Upload .json key file</span>}
+                  </label>
                 </div>
-              ))}
-              <div className="flex justify-between pt-2">
-                <button onClick={() => setStep(4)} className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors">
-                  <ArrowLeft className="w-4 h-4" /> Back
-                </button>
-                <button onClick={finish} disabled={loading} className="btn-primary text-sm flex items-center gap-2">
-                  {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Setting up...</> : <><ShieldCheck className="w-4 h-4" /> Complete Setup</>}
-                </button>
+
+                <div>
+                  <Label>Storage Bucket</Label>
+                  <input className="gh-input font-mono text-xs" placeholder="project-id.firebasestorage.app"
+                    value={form.storageBucket} onChange={e => u('storageBucket', e.target.value)} />
+                </div>
+
+                <div>
+                  <Label>② Web SDK Config</Label>
+                  <textarea className="gh-input text-xs font-mono resize-none" rows={5}
+                    placeholder={`const firebaseConfig = {\n  apiKey: "...",\n  projectId: "..."\n};`}
+                    value={form.webConfigRaw} onChange={e => u('webConfigRaw', e.target.value)} />
+                  <Hint>Paste exactly as-is — JS or JSON both work</Hint>
+                </div>
+
+                {firestoreErr && (
+                  <InfoBox color="red">
+                    <p>{firestoreErr.error}</p>
+                    <a href={firestoreErr.firestoreUrl} target="_blank" rel="noreferrer"
+                      className="text-[#58a6ff] hover:underline mt-1 inline-block">→ Enable Firestore API</a>
+                  </InfoBox>
+                )}
+                {fbValid && <InfoBox color="green">Connected to <strong>{fbProjectId}</strong></InfoBox>}
+
+                <div className="flex justify-between pt-1">
+                  <button onClick={() => setStep(1)} className="gh-btn-secondary flex items-center gap-1.5">
+                    <ArrowLeft className="w-3.5 h-3.5" /> Back
+                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={validateFirebase} disabled={loading || !form.serviceAccountJson || !form.webConfigRaw}
+                      className="gh-btn-secondary flex items-center gap-1.5">
+                      {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Database className="w-3.5 h-3.5" />} Test
+                    </button>
+                    <button onClick={() => setStep(3)} disabled={!fbValid} className="gh-btn-blue flex items-center gap-1.5">
+                      Next <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* ─── Step 3: Telegram ─── */}
+            {step === 3 && (
+              <div className="space-y-4">
+                <div>
+                  <Label>Bot Token</Label>
+                  <input className="gh-input font-mono text-xs" placeholder="110201543:AAHdqTcvCH1..."
+                    value={form.botToken} onChange={e => { u('botToken', e.target.value); setBotValid(false); }} />
+                  <Hint>Get from @BotFather on Telegram</Hint>
+                </div>
+                <div>
+                  <Label>Channel ID</Label>
+                  <input className="gh-input font-mono" placeholder="-1001234567890"
+                    value={form.channelId} onChange={e => { u('channelId', e.target.value); setBotValid(false); }} />
+                  <Hint>Bot must be admin in this channel. Session PDFs are sent here.</Hint>
+                </div>
+                {botValid && <InfoBox color="green">@{botInfo?.botUsername} verified ✓</InfoBox>}
+                <div className="flex justify-between pt-1">
+                  <button onClick={() => setStep(2)} className="gh-btn-secondary flex items-center gap-1.5">
+                    <ArrowLeft className="w-3.5 h-3.5" /> Back
+                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={validateBot} disabled={loading || !form.botToken || !form.channelId}
+                      className="gh-btn-secondary flex items-center gap-1.5">
+                      {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Test Bot'}
+                    </button>
+                    <button onClick={() => setStep(4)} disabled={!botValid} className="gh-btn-blue flex items-center gap-1.5">
+                      Next <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ─── Step 4: SMTP ─── */}
+            {step === 4 && (
+              <div className="space-y-4">
+                <InfoBox color="yellow">
+                  Optional. Skip if you don't need email verification or password resets via email.
+                </InfoBox>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>SMTP Host</Label>
+                    <input className="gh-input text-sm" placeholder="smtp.gmail.com"
+                      value={form.smtpHost} onChange={e => u('smtpHost', e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>Port</Label>
+                    <input className="gh-input text-sm" placeholder="587"
+                      value={form.smtpPort} onChange={e => u('smtpPort', e.target.value)} />
+                  </div>
+                </div>
+                <div>
+                  <Label>Username</Label>
+                  <input className="gh-input text-sm" placeholder="you@gmail.com"
+                    value={form.smtpUser} onChange={e => u('smtpUser', e.target.value)} />
+                </div>
+                <div>
+                  <Label>App Password</Label>
+                  <input className="gh-input text-sm" type="password"
+                    value={form.smtpPass} onChange={e => u('smtpPass', e.target.value)} />
+                </div>
+                <div>
+                  <Label>From Address</Label>
+                  <input className="gh-input text-sm" placeholder="Support <noreply@company.com>"
+                    value={form.smtpFrom} onChange={e => u('smtpFrom', e.target.value)} />
+                </div>
+                <div className="flex justify-between pt-1">
+                  <button onClick={() => setStep(3)} className="gh-btn-secondary flex items-center gap-1.5">
+                    <ArrowLeft className="w-3.5 h-3.5" /> Back
+                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => setStep(5)} className="gh-btn-secondary">Skip</button>
+                    <button onClick={() => setStep(5)} className="gh-btn-blue flex items-center gap-1.5">
+                      Next <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ─── Step 5: Admin ─── */}
+            {step === 5 && (
+              <div className="space-y-4">
+                {form.smtpHost && <InfoBox color="blue">A verification email will be sent to this admin account.</InfoBox>}
+                <div>
+                  <Label>Full Name</Label>
+                  <input className="gh-input" placeholder="John Doe"
+                    value={form.adminName} onChange={e => u('adminName', e.target.value)} />
+                </div>
+                <div>
+                  <Label>Email</Label>
+                  <input className="gh-input" type="email" placeholder="admin@company.com"
+                    value={form.adminEmail} onChange={e => u('adminEmail', e.target.value)} />
+                </div>
+                <div>
+                  <Label>Password</Label>
+                  <div className="relative">
+                    <input className="gh-input pr-10" type={showPass ? 'text' : 'password'} placeholder="Min 8 characters"
+                      value={form.adminPassword} onChange={e => u('adminPassword', e.target.value)} />
+                    <button type="button" onClick={() => setShowPass(p => !p)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6e7681] hover:text-[#e6edf3] transition-colors">
+                      {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+                <div className="flex justify-between pt-1">
+                  <button onClick={() => setStep(4)} className="gh-btn-secondary flex items-center gap-1.5">
+                    <ArrowLeft className="w-3.5 h-3.5" /> Back
+                  </button>
+                  <button onClick={() => setStep(6)}
+                    disabled={!form.adminName || !form.adminEmail || form.adminPassword.length < 8}
+                    className="gh-btn-blue flex items-center gap-1.5">
+                    Next <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ─── Step 6: Review ─── */}
+            {step === 6 && (
+              <div className="space-y-3">
+                {/* Company preview */}
+                {(form.companyLogoBase64 || form.companyName) && (
+                  <div className="flex items-center gap-3 p-3 bg-[#21262d] rounded-md border border-[#30363d] mb-4">
+                    {form.companyLogoBase64 && (
+                      <img src={form.companyLogoBase64} alt="" className="h-8 w-auto object-contain" />
+                    )}
+                    <div>
+                      <p className="text-sm font-semibold text-[#e6edf3]">{form.companyName}</p>
+                      {form.companyTagline && <p className="text-xs text-[#8b949e]">{form.companyTagline}</p>}
+                    </div>
+                    {form.companyPrimaryColor && (
+                      <div className="ml-auto w-5 h-5 rounded-full border border-[#30363d]"
+                        style={{ background: form.companyPrimaryColor }} />
+                    )}
+                  </div>
+                )}
+
+                <div className="divide-y divide-[#21262d]">
+                  {[
+                    ['Firebase Project', fbProjectId],
+                    ['Storage Bucket', form.storageBucket],
+                    ['Telegram Bot', botInfo ? `@${botInfo.botUsername}` : '—'],
+                    ['Channel', form.channelId],
+                    ['SMTP', form.smtpHost || 'Not configured'],
+                    ['Admin', form.adminEmail],
+                    ['Company', form.companyName || '—'],
+                    ['Website', form.companyWebsite || '—'],
+                  ].map(([label, val]) => (
+                    <div key={label} className="flex justify-between items-center py-2.5 text-sm">
+                      <span className="text-[#8b949e]">{label}</span>
+                      <span className="text-[#e6edf3] font-mono text-xs bg-[#21262d] px-2 py-0.5 rounded">{val}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex justify-between pt-2">
+                  <button onClick={() => setStep(5)} className="gh-btn-secondary flex items-center gap-1.5">
+                    <ArrowLeft className="w-3.5 h-3.5" /> Back
+                  </button>
+                  <button onClick={finish} disabled={loading} className="gh-btn-primary flex items-center gap-1.5">
+                    {loading
+                      ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Setting up…</>
+                      : <><ShieldCheck className="w-3.5 h-3.5" /> Complete Setup</>}
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </div>
         </div>
       </div>
     </div>

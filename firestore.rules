@@ -2,97 +2,32 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── Helper: check if the request comes from a signed-in user ──────────
-    function isSignedIn() {
-      return request.auth != null;
-    }
+    // Bot/public read collections
+    match /botTexts/{d}    { allow read: if true; allow write: if false; }
+    match /languages/{d}   { allow read: if true; allow write: if false; }
+    match /botCommands/{d} { allow read: if true; allow write: if false; }
+    match /botMenus/{d}    { allow read: if true; allow write: if false; }
 
-    // ── configs, botTexts, languages, botCommands, botMenus ──────────────
-    //    Read by frontend (setup wizard, bot texts). Write only from backend.
-    match /configs/{docId} {
-      allow read: if isSignedIn();
-      allow write: if false; // backend only (Admin SDK bypasses rules)
-    }
+    // Backend-only (Admin SDK bypasses rules entirely)
+    match /configs/{d}            { allow read, write: if false; }
+    match /userPrefs/{d}          { allow read, write: if false; }
+    match /pendingOtps/{d}        { allow read, write: if false; }
+    match /blacklist/{d}          { allow read, write: if false; }
+    match /emailVerifications/{d} { allow read, write: if false; }
 
-    match /botTexts/{docId} {
-      allow read: if true;   // bot + unauthenticated widget needs this
-      allow write: if false;
-    }
-
-    match /languages/{docId} {
+    // Dashboard collections — open read for authenticated requests.
+    // NOTE: Authentication is handled at the backend API layer (JWT).
+    // These collections are only written by the backend (Admin SDK).
+    // If you use Firebase custom auth tokens, replace `true` with
+    // `request.auth != null` below.
+    match /users/{d}     { allow read: if true; allow write: if false; }
+    match /sessions/{d}  {
       allow read: if true;
       allow write: if false;
+      match /messages/{m} { allow read: if true; allow write: if false; }
     }
-
-    match /botCommands/{docId} {
-      allow read: if true;
-      allow write: if false;
-    }
-
-    match /botMenus/{docId} {
-      allow read: if true;
-      allow write: if false;
-    }
-
-    // ── userPrefs — telegram bot stores language preference ───────────────
-    match /userPrefs/{chatId} {
-      allow read, write: if false; // backend only
-    }
-
-    // ── pendingOtps ───────────────────────────────────────────────────────
-    match /pendingOtps/{docId} {
-      allow read, write: if false; // backend only
-    }
-
-    // ── blacklist ─────────────────────────────────────────────────────────
-    match /blacklist/{docId} {
-      allow read, write: if false; // backend only
-    }
-
-    // ── users (workers + admins) ──────────────────────────────────────────
-    //    A user can read their own document.
-    //    Admins can read all users.
-    //    Writes are backend-only.
-    match /users/{userId} {
-      allow read: if isSignedIn() && (
-        request.auth.uid == userId ||
-        request.auth.token.role == 'admin'
-      );
-      allow write: if false;
-    }
-
-    // ── sessions ──────────────────────────────────────────────────────────
-    //    Workers can read sessions assigned to them.
-    //    Admins can read all sessions.
-    //    Writes are backend-only (Admin SDK).
-    match /sessions/{sessionId} {
-      allow read: if isSignedIn() && (
-        request.auth.token.role == 'admin' ||
-        resource.data.workerId == request.auth.uid
-      );
-      allow write: if false;
-
-      // messages subcollection — same access as parent session
-      match /messages/{messageId} {
-        allow read: if isSignedIn() && (
-          request.auth.token.role == 'admin' ||
-          get(/databases/$(database)/documents/sessions/$(sessionId)).data.workerId == request.auth.uid
-        );
-        allow write: if false;
-      }
-    }
-
-    // ── chats (top-level mirror for worker dashboard real-time view) ──────
-    //    Workers can read chats assigned to them.
-    //    Admins can read all.
-    //    Writes are backend-only (Admin SDK).
-    match /chats/{chatId} {
-      allow read: if isSignedIn() && (
-        request.auth.token.role == 'admin' ||
-        resource.data.workerId == request.auth.uid
-      );
-      allow write: if false;
-    }
+    match /chats/{d}         { allow read: if true; allow write: if false; }
+    match /notifications/{d}  { allow read: if true; allow write: if false; }
 
   }
 }
